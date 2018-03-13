@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewBag.Title = "Food Menu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="JARJU_Module" ng-controller="FoodMenuController" style="width:100%">
+    <div class="row custom-row" style="font-size:10pt">
+        <div class="col-md-1">
+            <label>
+                Filter :
+            </label>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_ID" ng-model="FILTER.MENU_ID" placeholder="Menu code">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="MENU_NAME" ng-model="FILTER.MENU_NAME" placeholder="Menu name (TH)">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_TYPE" ng-model="FILTER.MENU_TYPE_NAME" placeholder="Menu type">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_CATE" ng-model="FILTER.MENU_CATE_NAME" placeholder="Menu category">
+        </div>
+        <div class="col-md-2" style="text-align:right">
+            <button type="button" class="btn btn-success" ng-click="ShowItem_Click(0)">
+                <span class="glyphicon glyphicon-plus"></span> Add
+            </button>
+        </div>
+    </div>
+    <div id="ResultSection" class="row custom-row">
+        <div id="detail" class="sm-table-container">
+            <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                <thead>
+                    <tr class="sm-table-header">
+                        <th class="tblHeader"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            valign="top" width="{{Field.WIDTH}}" align="center">
+                            <a href="javscript:void(0);"
+                               ng-click="OrderColumn(Field.FIELD_NAME)">
+                                {{Field.TITLE}}
+                                <span ng-show="sortType == Field.FIELD_NAME && !sortReverse" class="fa fa-caret-down"></span>
+                                <span ng-show="sortType == Field.FIELD_NAME && sortReverse" class="fa fa-caret-up"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+               <tbody>
+                    <tr class="sm-table-row"
+                        ng-repeat="row in ListDetail
+                                    | filter:{MENU_ID : FILTER.MENU_ID}
+                                    | filter:{NAME : FILTER.MENU_NAME}
+                                    | filter:{MENU_CATE_NAME : FILTER.MENU_CATE_NAME}
+                                    | filter:{MENU_TYPE_NAME : FILTER.MENU_TYPE_NAME}
+                                    | orderBy:sortType:sortReverse">
+                        <td class="tblDetail"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                            <div ng-if="Field.FIELD_NAME == 'EDIT'">
+                                <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.MENU_ID)">
+                                </a>
+                            </div>
+                            <div ng-if="Field.FIELD_NAME != 'EDIT'">
+                                {{ row[Field.FIELD_NAME] }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="DetailModal" class="w3-modal w3-display-topmiddle" style="width:100%;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DetailModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+
+            <div class="col-sm-12 hdBar">
+                <h4>Edit Food menu</h4>
+            </div>
+
+            <div id="EditItem" class="row">
+                <form name="dealerConf">
+                    <div class="row custom-row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-2">
+                            Menu code:
+                        </div>
+                        <div class="col-md-3">
+                            {{formData.FoodMenu.MENU_ID}}
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-2">
+                            Menu name:
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="foodmenuname" ng-model="formData.FoodMenu.NAME">
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-2">
+                            Menu type:
+                        </div>
+                        <div class="col-md-3">
+                            <select ng-model="formData.FoodMenu.MENU_TYPE_ID" class="form-control" convert-to-number>
+                                <option ng-repeat="type in MenuTypeList" value="{{type.ID}}">{{type.NAME}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-2">
+                            Menu category:
+                        </div>
+                        <div class="col-md-3">
+                            <select ng-model="formData.FoodMenu.MENU_CATE_ID" class="form-control" name="MENU_CATE" convert-to-number>
+                                <option ng-repeat="cate in MenuCategoryList" value="{{cate.ID}}">{{cate.NAME}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <br>
+                    <div class="row custom-row">
+                        <div class="col-md-3"></div>
+                        <div class="btn-group" role="group">
+
+                            <button type="button" class="btn btn-primary" ng-click="Edit_Submit()">
+                                <span class="glyphicon glyphicon-floppy-save"></span> บันทึก
+                            </button>
+
+                            <a class="btn btn-default" ng-click="CloseItem_Click()">
+                                <div>
+                                    <span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div style="height:20px"></div>
+</div>

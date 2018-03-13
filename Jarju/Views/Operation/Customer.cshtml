@@ -1,0 +1,236 @@
+﻿
+@{
+    ViewBag.Title = "Customer information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="JARJU_Module" ng-controller="CustomerController" style="width:100%">
+    <div class="row custom-row" style="font-size:10pt">
+        <div class="col-md-1">
+            <label>
+                Filter :
+            </label>
+        </div>
+        <div class="col-md-1">
+            <input type="text" class="form-control" name="MENU_ID" ng-model="FILTER.ID" placeholder="Code" ng-change="CheckPagination()">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_NAME" ng-model="FILTER.NAME" placeholder="Name" ng-change="CheckPagination()">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_NAME" ng-model="FILTER.PLACE" placeholder="Place" ng-change="CheckPagination()">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_TYPE" ng-model="FILTER.TEL" placeholder="Tel." ng-change="CheckPagination()">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_CATE" ng-model="FILTER.EMAIL" placeholder="E-mail" ng-change="CheckPagination()">
+        </div>
+        <div class="col-md-2" style="text-align:right">
+            <button type="button" class="btn btn-success" ng-click="ShowItem_Click(0)">
+                <span class="glyphicon glyphicon-plus"></span> Add
+            </button>
+        </div>
+    </div>
+    <div id="ResultSection" class="row custom-row">
+        <div id="detail" class="sm-table-container">
+            <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                <thead>
+                    <tr class="sm-table-header">
+                        <th class="tblHeader"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            valign="top" width="{{Field.WIDTH}}" align="center">
+                            <a href="javscript:void(0);"
+                               ng-click="OrderColumn(Field.FIELD_NAME)">
+                                {{Field.TITLE}}
+                                <span ng-show="sortType == Field.FIELD_NAME && !sortReverse" class="fa fa-caret-down"></span>
+                                <span ng-show="sortType == Field.FIELD_NAME && sortReverse" class="fa fa-caret-up"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+               <tbody>
+                    <tr class="sm-table-row"
+                        ng-repeat="row in ListDetail
+                                    | filter:{ID : FILTER.ID}
+                                    | filter:{NAME : FILTER.NAME}
+                                    | filter:{PLACE : FILTER.PLACE}
+                                    | filter:{TEL : FILTER.TEL}
+                                    | filter:{EMAIL : FILTER.EMAIL}
+                                    | paginationRecs:currentPage:recPerPage
+                                    | orderBy:sortType:sortReverse">
+                        <td class="tblDetail"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                            <div ng-if="Field.FIELD_NAME == 'EDIT'">
+                                <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.ID)">
+                                </a>
+                            </div>
+                            <div ng-if="Field.FIELD_NAME != 'EDIT' && Field.TRUNCATE == true">
+                                {{ row[Field.FIELD_NAME].trunc(25) }}
+                            </div>
+                            <div ng-if="Field.TRUNCATE == false">
+                                {{ row[Field.FIELD_NAME] }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <fieldset id="PaginationDiv">
+            <div id="detail2" class="sm-table-container" pagination-table="ListDetail">
+            </div>
+        </fieldset>
+        
+    </div>
+
+
+    <div id="DetailModal" class="w3-modal w3-display-topmiddle" style="width:100%;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span ng-click="CloseItem_Click()"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+            <div class="row hdBar">
+                <div class="col-sm-9"><h4>Edit Customer</h4></div>
+                <div class="col-sm-3" style="margin-top:6px;text-align:right;">
+                    <button type="button" class="btn btn-primary" ng-click="Edit_Submit()">
+                        <span class="glyphicon glyphicon-floppy-save"></span> Save
+                    </button>
+                </div>
+            </div>
+            <div id="EditItem" class="row">
+                <div id="CustomerInfo" class="col-sm-4">
+                    <div class="row custom-row">
+                        <div class="col-md-5">
+                            Code:
+                        </div>
+                        <div class="col-md-3">
+                            {{formData.Customer.ID}}
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Name:
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Customer.NAME">
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Place:
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Customer.PLACE">
+                        </div>
+                    </div>
+
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Address:
+                        </div>
+                        <div class="col-md-6">
+                            <textarea class="form-control" rows="3" placeholder="Billing Address" ng-model="formData.Customer.ADDRESS"></textarea>
+                        </div>
+                    </div>
+
+                    <br>
+                    <div class="row custom-row">
+                        <div class="col-md-3"></div>
+                        
+                    </div>
+                </div>
+
+                <div class="col-sm-3" style="margin-top:10px;">
+                    <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                        <thead>
+                            <tr class="sm-table-header">
+                                <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                    valign="top" align="center">
+                                    Tel
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody style="height:auto;">
+                            <tr class="sm-table-row"
+                                ng-repeat="row in ListTel">
+                                <td class="tblDetail">
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="foodmenuname" ng-model="row.TEL" maxlength="10" format-numeric>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger" ng-click="DeleteTel_Click(row)">
+                                            <span class="glyphicon glyphicon-minus"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="sm-table-row"></tr>
+                            <tr class="sm-table-row">
+                                <td class="tblDetail">
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="foodmenuname" ng-model="ADDTEL" maxlength="10" format-numeric>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-success" ng-click="AddTel_Click()">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-sm-5" style="margin-top:10px;">
+                    <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                        <thead>
+                            <tr class="sm-table-header">
+                                <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                    valign="top" align="center">
+                                    Email
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody style="height:auto;">
+                            <tr class="sm-table-row"
+                                ng-repeat="row in ListEmail">
+                                <td class="tblDetail">
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="foodmenuname" ng-model="row.EMAIL">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger" ng-click="DeleteEmail_Click(row)">
+                                            <span class="glyphicon glyphicon-minus"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="sm-table-row"></tr>
+                            <tr class="sm-table-row">
+                                <td class="tblDetail">
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="foodmenuname" ng-model="ADDEMAIL">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-success" ng-click="AddEmail_Click()">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height:20px"></div>
+</div>

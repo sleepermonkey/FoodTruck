@@ -1,0 +1,15 @@
+﻿
+<div style="float:right;width:100%;background-color:#eee">
+    @if (HttpContext.Current.Session["ssUserID"] != null)
+    {
+        <div class="row" style="color:#d4d4d4;font-size:9pt;padding:4px;text-align:right;">
+
+        </div>
+        <div class="row" style="color:#747373;font-size:11pt;padding:4px;text-align:right;">
+            <a href="@Url.Action("Personal", "System")" style="color:#000;" >@HttpContext.Current.Session["ssUserName"]</a> -
+            <a href="@Url.Action("BackOut", "System")" style="color:#000;font-size:9pt;width:80px">[LOG OFF]</a>
+        </div>
+
+    }
+
+</div>

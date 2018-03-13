@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Customer information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="TestGridController" style="width:100%">
+    <div class="row custom-row" style="font-size:10pt">
+        <div>
+        </div>
+        <div class="theme">
+            <img src="~/Content/img/3_3.png" style="position: absolute;width:600px"/>
+            <table border="1" class="theme-table" style="position: relative;width:100%;height:100%;">
+                <tbody>
+                    <tr ng-repeat="n in [].constructor(48)  track by $index">
+                        <td ng-repeat="nn in [].constructor(64)  track by $index" ng-click="selectPosition($parent.$index, $index)"
+                            ng-class="{active: CheckActivePosition($parent.$index,$index), inactive: !CheckActivePosition($parent.$index,$index)}"
+                            draggable droppable drop="handleDrop" id="{{$parent.$index}},{{$index}}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

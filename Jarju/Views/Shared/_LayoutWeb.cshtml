@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>JARJU : @ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/BaseSite.css" rel="stylesheet" />
+    <link href="~/Content/ui-bootstrap-csp.css" rel="stylesheet" />
+    <link href="~/Content/W3.css" rel="stylesheet" />
+</head>
+<body class="bodyCss">
+    <div class="navbar-fixed-top" style="top:32px;background-color:#ffffff;height:130px;">
+        <div class="container" >
+            <!--<div class="title">
+                <a href="@Url.Action("Main", "System")">
+                    <img src="~/Content/img/logo.png" height="100" alt="จ่าจู แคทเทอริ่ง" />
+                </a>
+            </div>
+            <div style="width:500px;margin-top:32px;margin-left:120px;">
+                <h2> JARJU </h2>
+            </div>-->
+            <div style="border-bottom:1px solid #d1d1d1;"></div>
+            <div style="width:500px;margin-top:5px;margin-left:120px;">
+                <h3> @ViewBag.PageTitle </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content" ng-app="FoodTruck_Module">
+        <div style="height:165px;width:100%;"></div>
+        @RenderBody()
+        <hr />
+        <script type="text/ng-template" id="confirm-modal">
+            <div class="message-container">
+                <div class="message-header">
+                    <span class="glyphicon glyphicon-question-sign"></span> Confirmation
+                </div>
+                <div class="message">
+                    {{modalOptions.bodyText}}
+                </div>
+                <div class="message-buttons">
+                    <button class="btn btn-default" data-ng-click="modalOptions.ok()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        Yes
+                    </button>
+                    <button class="btn btn-default" data-ng-click="modalOptions.close()">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        No
+                    </button>
+                </div>
+            </div>
+        </script>
+        <script type="text/ng-template" id="info-modal">
+            <div class="message-container">
+                <div class="message-header info">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Info
+                </div>
+                <div class="message">
+                    {{modalOptions.bodyText}}
+                </div>
+                <div class="message-buttons">
+                    <button class="btn btn-default" data-ng-click="modalOptions.ok()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        OK
+                    </button>
+                </div>
+            </div>
+        </script>
+        <script type="text/ng-template" id="warning-modal">
+            <div class="message-container">
+                <div class="message-header warning">
+                    <span class="glyphicon glyphicon-exclamation-sign"></span>
+                    Warning
+                </div>
+                <div class="message">
+                    {{modalOptions.bodyText}}
+                </div>
+                <div class="message-buttons">
+                    <button class="btn btn-default" data-ng-click="modalOptions.ok()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        OK
+                    </button>
+                </div>
+            </div>
+        </script>
+        <script type="text/ng-template" id="alert-modal">
+            <div class="message-container">
+                <div class="message-header alert">
+                    <span class="glyphicon glyphicon-remove-sign"></span>
+                    Alert
+                </div>
+                <div class="message">
+                    {{modalOptions.bodyText}}
+                </div>
+                <div class="message-buttons">
+                    <button class="btn btn-default" data-ng-click="modalOptions.ok()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        OK
+                    </button>
+                </div>
+            </div>
+        </script>
+        <footer>
+            <p style="font-size:10px;color:#8e8e8e">&copy; @DateTime.Now.Year - Jarju Catering Co., Ltd.</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-ui/ui-bootstrap-tpls.js"></script>
+    <script src="~/AngApp/AppFoodTruck.js"></script>
+    <script src="~/AngApp/FactoryServices.js"></script>
+
+    <script>
+        sessionStorage.clear()
+    </script>
+
+</body>
+</html>

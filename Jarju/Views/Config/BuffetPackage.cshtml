@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewBag.Title = "Buffet Package";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="JARJU_Module" ng-controller="BuffetPackageController" style="width:100%">
+    <div class="row custom-row" style="font-size:10pt">
+        <div class="col-md-1">
+            <label>
+                Filter :
+            </label>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_ID" ng-model="FILTER.PACKAGE_ID" placeholder="Package code">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="MENU_NAME" ng-model="FILTER.NAME" placeholder="Package name">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_CATE" ng-model="FILTER.MIN_AMOUNT" placeholder="Minimum amount">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="MENU_TYPE" ng-model="FILTER.PRICE" placeholder="Price">
+        </div>
+        <div class="col-md-2" style="text-align:right"> 
+            <button type="button" class="btn btn-success" ng-click="ShowItem_Click(0)">
+                <span class="glyphicon glyphicon-plus"></span> Add
+            </button>
+        </div>
+    </div>
+    <div id="ResultSection" class="row custom-row">
+        <div id="detail" class="sm-table-container">
+            <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                <thead>
+                    <tr class="sm-table-header">
+                        <th class="tblHeader"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            valign="top" width="{{Field.WIDTH}}" align="center">
+                            <a href="javscript:void(0);"
+                               ng-click="OrderColumn(Field.FIELD_NAME)">
+                                {{Field.TITLE}}
+                                <span ng-show="sortType == Field.FIELD_NAME && !sortReverse" class="fa fa-caret-down"></span>
+                                <span ng-show="sortType == Field.FIELD_NAME && sortReverse" class="fa fa-caret-up"></span>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+               <tbody>
+                    <tr class="sm-table-row"
+                        ng-repeat="row in ListDetail
+                                    | filter:{PACKAGE_ID : FILTER.PACKAGE_ID}
+                                    | filter:{NAME : FILTER.NAME}
+                                    | filter:{MIN_AMOUNT : FILTER.MIN_AMOUNT}
+                                    | filter:{PRICE : FILTER.PRICE}
+                                    | orderBy:sortType:sortReverse">
+                        <td class="tblDetail"
+                            ng-repeat="Field in ListHeader"
+                            ng-show="Field.VISIBILITY==1"
+                            width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                            <div ng-if="Field.FIELD_NAME == 'EDIT'">
+                                <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.PACKAGE_ID)">
+                                </a>
+                            </div>
+                            <div ng-if="Field.FIELD_NAME != 'EDIT'">
+                                {{ row[Field.FIELD_NAME] }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="DetailModal" class="w3-modal w3-display-topmiddle" style="width:100%;overflow:hidden;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DetailModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="container col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="font-size: 10pt;">
+            <div class="col-sm-12 hdBar">
+                <h4>Edit Buffet Package</h4>
+            </div>
+            <div class="col-sm-12" style="display:inline-block;">
+                <div class="col-sm-5">
+                    <div class="row custom-row">
+                        <div class="col-md-5">
+                            Package code:
+                        </div>
+                        <div class="col-md-3">
+                            {{formData.Package.PACKAGE_ID}}
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-5">
+                            Package name:
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="packagename" ng-model="formData.Package.NAME">
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-5">
+                            Minimum amount:
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" class="form-control" name="minimumamount" ng-model="formData.Package.MIN_AMOUNT">
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-5">
+                            Price:
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" class="form-control" name="packageprice" ng-model="formData.Package.PRICE">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row custom-row">
+                        <div class="col-md-3"></div>
+                        <div class="btn-group" role="group">
+
+                            <button type="button" class="btn btn-primary" ng-click="Edit_Submit()">
+                                <span class="glyphicon glyphicon-floppy-save"></span> บันทึก
+                            </button>
+
+                            <a class="btn btn-default" ng-click="CloseItem_Click()">
+                                <div>
+                                    <span class="glyphicon glyphicon-chevron-left"></span> ย้อนกลับ
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" style="margin-top:10px;">
+                    <div id="packagemenu" class="sm-table-container">
+                        <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                            <thead>
+                                <tr class="sm-table-header">
+                                    <th class="tblHeader" valign="top" align="center" style="border-top-left-radius:6px;">
+                                        Category
+                                    </th>
+                                    <th class="tblHeader" valign="top" align="center" style="border-top-right-radius:6px;">
+                                        Menu amount
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody style="height:auto;">
+                                <tr class="sm-table-row" ng-repeat="row in formData.CATE">
+                                    <td class="tblDetail" valign="top" align="center">{{row.NAME}}</td>
+                                    <td class="tblDetail" valign="top" align="center">
+                                        <input type="number" class="form-control" name="menuamount" ng-model="row.MENU_AMOUNT" style="width:75px;">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="height:20px"></div>
+</div>
