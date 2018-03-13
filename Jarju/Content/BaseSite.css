@@ -1112,7 +1112,7 @@ a.pointer-link {
 
 /* Navbar container */
 .navbar {
-  overflow: scroll;
+  overflow: hidden;
   background-color: #333;
   font-family: Arial;
 }
