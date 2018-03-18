@@ -14,19 +14,19 @@
 
     <div id="main" class="container" style="border-left:1px solid #cecece; border-right:1px solid #cecece; min-height: 100%;">
 
-        <div id="HeaderSection" class="row">
-            <div id="LogoSection" class="col-md-2" style="margin:auto;background-color:#13d34a;height:100px">
+        <div id="HeaderSection" class="row" style="margin-bottom:0px">
+            <div id="LogoSection" class="col-md-2" style="margin:0px;background-color:#13d34a;">
                 <!--<div style="text-align:center">
                     <a href="@Url.Action("Main", "System")">
                         <img src="~/Content/img/logo.png" height="100" alt="จ่าจู แคทเทอริ่ง" />
                     </a>
                 </div>-->
             </div>
-            <div id="SystemSection" class="col-md-10" style="height:120px;">
-                <div class="row" style="background-color:#13D34A;color:#ffffff;height:60px;">
+            <div id="SystemSection" class="col-md-10" style="margin:0px">
+                <div class="row" style="background-color:#13D34A;color:#ffffff;">
                     <div class="col-md-7">
                         <!--<h2> JARJU </h2>-->
-                        <h2> Test </h2>
+                        <h2> Food Truck Event </h2>
                     </div>
                     <div class="col-md-5 navbar-collapse collapse" style="float:right;">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
@@ -35,23 +35,40 @@
                                 <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
                                 <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
                             </div>
+                        } else
+                        {
+                            <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
+                                <a href="@Url.Action("Login", "Home")" style="font-size:9pt">[LOG IN]</a>
+                            </div>
                         }
-                    </div>
-                </div>
-                <div class="row" style="height:60px;border-left:1px solid #cecece;">
-                    <div class="col-md-12">
-                        <h3>@ViewBag.Title</h3>
                     </div>
                 </div>
             </div>       
         </div> 
-        <div class="row navbar">
-            <a href="#home">Home</a>
-            <a href="#news">News</a>
+        <div class="row" style="margin-top:0px;background-color:#4CAF50">
             <div class="dropdown">
                 <button class="dropbtn">
                     Dropdown
-                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    Dropdown
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    Dropdown
                 </button>
                 <div class="dropdown-content">
                     <a href="#">Link 1</a>
