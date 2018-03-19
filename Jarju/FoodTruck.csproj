@@ -168,6 +168,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\EventDsController.cs" />
     <Compile Include="Controllers\OperationDsController.cs" />
     <Compile Include="Controllers\OperationController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
@@ -183,6 +184,7 @@
   <ItemGroup>
     <Content Include="AngApp\AppFoodTruck.js" />
     <Content Include="AngApp\FactoryServices.js" />
+    <Content Include="AngApp\jEvent.js" />
     <Content Include="AngApp\jOperation.js" />
     <Content Include="AngApp\jConfiguration.js" />
     <Content Include="bower_components\angular-bootstrap-calendar\dist\css\angular-bootstrap-calendar.css" />
@@ -1342,8 +1344,7 @@
     <Folder Include="bower_components\angular-bootstrap-calendar\src\filters\" />
     <Folder Include="bower_components\angular-bootstrap-calendar\src\services\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\ConfigDs\" />
-    <Folder Include="Views\SystemDs\" />
+    <Folder Include="Views\Event\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

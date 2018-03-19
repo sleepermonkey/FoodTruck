@@ -1,6 +1,7 @@
 ﻿var app = angular.module('FoodTruck_Module', ['mwl.calendar', 'ui.bootstrap', 'ngAnimate'] );
 
 app.constant('SYSTEM_PATH', '/SystemDS');
+app.constant('EVENT_PATH', '/EventDS');
 app.constant('CONFIG_PATH', '/ConfigDS');
 app.constant('OPERATION_PATH', '/OperationDs');
 //app.constant('REPORT_PATH', '/WSYS/mllReport.aspx?rid=');

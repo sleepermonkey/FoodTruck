@@ -31,6 +31,7 @@ namespace Jarju.Controllers
             //ismoUtil ismo = new ismoUtil();
 
             //---- Check user password only A-Z a-z 0-9
+
             //if (!ismo.CheckSpecialCharacter(user))
             //{
             //    lblMsg = "User name ไม่ถูกต้อง";

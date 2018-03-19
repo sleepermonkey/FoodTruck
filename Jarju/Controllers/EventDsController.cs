@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Jarju.Controllers
 {
-    public class OperationDsController : Controller
+    public class EventDsController : Controller
     {
         private DBManager odb = new DBManager();
         private String gSQL = "";
@@ -22,18 +22,6 @@ namespace Jarju.Controllers
             DataTable dt = new DataTable();
 
             gSQL = "EXEC [sp_Event_List] {0}";
-            gSQL = String.Format(gSQL,
-                        (Request.Form["ID"] != null && Request.Form["ID"] != "") ? "'" + Request.Form["ID"] + "'" : "null");
-            dt = odb.SqlQuery(gSQL, mDBName);
-
-            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetCustomerList()
-        {
-            DataTable dt = new DataTable();
-
-            gSQL = "EXEC [sp_Customer_List] {0}";
             gSQL = String.Format(gSQL,
                         (Request.Form["ID"] != null && Request.Form["ID"] != "") ? "'" + Request.Form["ID"] + "'" : "null");
             dt = odb.SqlQuery(gSQL, mDBName);

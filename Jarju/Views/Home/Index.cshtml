@@ -1,55 +1,46 @@
-﻿@*@{
-    ViewBag.Title = "จ่าจู แคทเทอริ่ง";
-    Layout = "~/Views/Shared/_LayoutWeb.cshtml";
-}
-
-<div class="row">
-    <div style="min-height: 450px;">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 w3-border w3-round w3-border-grey" style="width:320px; margin-top: 20px; min-height:250px">
-                    <h3 class="col-sm-12 hdBar">Login to JARJU</h3>
-                    <form id="formLogin" class="form-signin" method="post" action="@Url.Action("Login", "System")">
-                        <div style="padding: 10px 0 20px 0">
-                            <div>Login name</div>
-                            <div><input type="text" id="txtusrname" name="usrname" class="form-control" style="width:300px" placeholder="User name" required="" autofocus=""></div>
-                            <div>Password</div>
-                            <div><input type="password" id="txtPassword" name="password" class="form-control" style="width:300px" placeholder="Password" required=""></div>
-                            <div style="text-align:right;font-size:9pt;padding:4px;width:280px"><a href="@Url.Action("ForgotPW", "System")">Forgot password?</a></div>
-
-                            <div>
-                                <span style="font-size:9pt;color:red">@ViewBag.MessageNoti</span>
-                            </div>
-                            <button class="btn btn-block w3-border w3-round-small" type="submit">Sign in</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-    </div>
-</div>*@
-
-
-
-@{
+﻿@{
     ViewBag.Title = "ค้นหาอีเวนท์";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div id="main" class="container" style="width:100%;">
-    <div class="container" style="width:100%;">
-
-        <div class="col-sm-3" style="background-color:#13d34a;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#ebebeb;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#d0d0d0;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#cccccc;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#bdbdbd;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#999999;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#666666;height:60px;"></div>
-        <div class="col-sm-3" style="background-color:#4c4c4c;height:60px;"></div>
-
-        <div style="height:230px;width:100%;"></div>
+<div id="main" class="container" style="width:100%;" ng-app="FoodTruck_Module" ng-controller="EventDisplayController">
+    <div class="container" style="width:100%;height:75vh">
+        <div class="row" ng-repeat="events in ListEvent" style="display: flex;align-items: center;justify-content: center;">
+            <div class="col-sm-3 eventBox" ng-repeat="event in events" ng-click="openEvent(event.EVENT_ID)">
+                <div>
+                    <img ng-src="{{event.COVER_PATH}}" style="position: absolute;max-width: 100%;max-height: 100%;" />
+                </div>
+                <div style="margin-top:180px">
+                    {{event.EVENT_ID}}
+                    {{event.COVER_PATH}}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div id="DetailModal" class="w3-modal w3-display-topmiddle" style="width:100%;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DetailModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+            <div class="col-sm-12 hdBar">
+                <h4>{{formData.EventDetail.EVENT_NAME}}</h4>
+            </div>
+            <div id="EditItem" class="row">
+                <form name="dealerConf">
+                    <div class="row custom-row">
+                        <img ng-src="{{formData.EventDetail.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-12">
+                            {{formData.EventDetail.DESCRIPTION}}
+                        </div>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
