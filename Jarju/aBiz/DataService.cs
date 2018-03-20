@@ -151,5 +151,15 @@ namespace FoodTruck.aBiz
                 System.IO.File.Delete(fileLocation);
             }
         }
+
+        public static string MapUploadPath(string fileLocation)
+        {
+            //NMT QA Server mappath
+            // string newLocation = aControl.Cons.SERVER_NAME_PATH + (fileLocation).Replace("~","").Replace("/","\\");
+
+            string newLocation = HttpContext.Current.Server.MapPath(fileLocation);
+
+            return newLocation;
+        }
     }
 }

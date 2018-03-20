@@ -1,4 +1,4 @@
-﻿var app = angular.module('FoodTruck_Module', ['mwl.calendar', 'ui.bootstrap', 'ngAnimate'] );
+﻿var app = angular.module('FoodTruck_Module', ['ngFileUpload','mwl.calendar', 'ui.bootstrap', 'ngAnimate'] );
 
 app.constant('SYSTEM_PATH', '/SystemDS');
 app.constant('EVENT_PATH', '/EventDS');
@@ -381,3 +381,7 @@ app.directive('droppable', function () {
         }
     }
 });
+
+if (!window.location.origin) {
+    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+}

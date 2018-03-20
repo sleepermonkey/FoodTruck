@@ -9,7 +9,7 @@ using FoodTruck.aControl;
 using System.Configuration;
 using System.Globalization;
 
-namespace Jarju.Controllers
+namespace FoodTruck.Controllers
 {
     public class EventDsController : Controller
     {
@@ -27,6 +27,109 @@ namespace Jarju.Controllers
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public ContentResult SubmitEvent()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Event_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["EVENT_NAME"]
+                                , Request.Form["EVENT_PLACE"]
+                                , Request.Form["START_DATE"]
+                                , Request.Form["END_DATE"]
+                                , Request.Form["DESCRIPTION"]
+                                , Session[Cons.SS_USER_ID].ToString());
+            Response.Write(gSQL);
+            Response.End();
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Content("Done");
+
+        }
+
+        [HttpPost]
+        public JsonResult UploadCoverImage(HttpPostedFileBase File, string periodMonth = "00", string periodYear = "00")
+        {
+
+            if (File != null && File.ContentLength > 0)
+            {
+
+                // Write file to Server
+                string gFileName = File.FileName;
+                string uploadLocationStr = "~/upload/Leasing/DataPeriod/" + periodYear + "/" + periodMonth + "/";
+                string uploadLocation = Server.MapPath(uploadLocationStr);
+                string fileLocation = uploadLocationStr + gFileName;
+
+                DataService.UploadFileByLocation(File
+                                                , uploadLocation
+                                                , Server.MapPath(fileLocation));
+
+
+                gSQL = String.Format("EXEC [sp_Leasing_Temp_Check] '{0}'"
+                                    , aBiz.DataService.MapUploadPath(fileLocation));
+                DataTable dt0 = odb.SqlQuery(gSQL, mDBName);
+
+
+                var invalidFieldList = "";
+                var invalidString = "";
+
+                foreach (DataRow dr in dt0.Rows)
+                {
+                    invalidFieldList = "";
+
+                    if (dr.Field<int>("CHASSIS_NO_PASS") == 0)
+                    {
+                        invalidFieldList = invalidFieldList + "[Serial Number] is invalid, ";
+                    }
+                    if (dr.Field<int>("APPLICATION_DATE_PASS") == 0)
+                    {
+                        invalidFieldList = invalidFieldList + "[Application Date] is invalid, ";
+                    }
+                    if (dr.Field<int>("BOOKING_DATE_PASS") == 0)
+                    {
+                        invalidFieldList = invalidFieldList + "[Booking Date] is invalid, ";
+                    }
+                    if (dr.Field<int>("CONTRACT_PASS") == 0)
+                    {
+                        invalidFieldList = invalidFieldList + "[Contract] is invalid, ";
+                    }
+                    if (dr.Field<int>("BUDGET_PASS") == 0)
+                    {
+                        invalidFieldList = invalidFieldList + "[Budget] is invalid, ";
+                    }
+
+                    if (invalidFieldList != "")
+                    {
+                        invalidString = invalidString + dr.Field<string>("CHASSIS_NO") + ": " + invalidFieldList + "\n";
+                    }
+                }
+
+                if (invalidString != "")
+                {
+                    return Json(new { result = 200, data = invalidString });
+                }
+
+                // Add data to Temp
+                gSQL = String.Format("EXEC [dbo].[sp_Leasing_Temp_Add] '{0}', '{1}', '{2}', '{3}', '{4}'"
+                                    , gFileName
+                                    , aBiz.DataService.MapUploadPath(fileLocation)
+                                    , fileLocation
+                                    , periodMonth
+                                    , periodYear);
+
+                DataTable dt = odb.SqlQuery(gSQL, mDBName);
+
+
+                return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+
+            }
+            else
+            {
+                return Json(new { result = 500 });
+            }
         }
 
         public JsonResult UpdateCustomerData()

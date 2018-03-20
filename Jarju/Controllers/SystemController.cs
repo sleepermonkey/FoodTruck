@@ -102,8 +102,7 @@ namespace Jarju.Controllers
             Session.Add(Cons.SS_USER_ID, '1');
             Session.Add(Cons.SS_USER_NAME, usrname);
             Session.Add(Cons.SS_USER_LAST_NAME, '1');
-            Session.Add(Cons.SS_USER_GROUP, '1');
-            Session.Add(Cons.SS_USER_DEPT, '1');
+            Session.Add(Cons.SS_USER_ROLE, '1'); //1 = Organizer 2 = Food Truck 3 = Customer
             Session.Add(Cons.SS_USER_LANG, '1');
 
             return RedirectToAction("Main", "System");
@@ -123,8 +122,7 @@ namespace Jarju.Controllers
             Session.Add(Cons.SS_USER_ID, '1');
             Session.Add(Cons.SS_USER_NAME, tokenStr);
             Session.Add(Cons.SS_USER_LAST_NAME, '1');
-            Session.Add(Cons.SS_USER_GROUP, '1');
-            Session.Add(Cons.SS_USER_DEPT, '1');
+            Session.Add(Cons.SS_USER_ROLE, '1'); //1 = Organizer 2 = Food Truck 3 = Customer
             Session.Add(Cons.SS_USER_LANG, '1');
 
             return RedirectToAction("Main", "System");
@@ -212,7 +210,7 @@ namespace Jarju.Controllers
         {
             ViewBag.Username = Session[Cons.SS_USER_NAME].ToString();
             ViewBag.MessageNoti = noti;
-            if (Session[Cons.SS_USER_GROUP].ToString() == "3")
+            if (Session[Cons.SS_USER_ROLE].ToString() == "3")
             {
                 return View("MainPage");
 

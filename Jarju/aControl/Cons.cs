@@ -11,8 +11,7 @@ namespace FoodTruck.aControl
         public const string SS_USER_ID = "ssUserID";
         public const string SS_USER_NAME = "ssUserName";
         public const string SS_USER_LAST_NAME = "ssLastName";
-        public const string SS_USER_GROUP = "ssUserGroup";
-        public const string SS_USER_DEPT = "ssUserDept";
+        public const string SS_USER_ROLE = "ssUserRole";
         public const string SS_USER_LANG = "ssUserLang";
 
 
