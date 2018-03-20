@@ -78,7 +78,6 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
         $scope.formData = {};
         $scope.DATE_FROM = new Date()
         $scope.DATE_TO = new Date()
-        $scope.confirmBtn = null;
         $scope.fileUpload = null;
     }
 
