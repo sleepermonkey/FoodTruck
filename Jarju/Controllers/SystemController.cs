@@ -105,7 +105,7 @@ namespace Jarju.Controllers
             Session.Add(Cons.SS_USER_ROLE, '1'); //1 = Organizer 2 = Food Truck 3 = Customer
             Session.Add(Cons.SS_USER_LANG, '1');
 
-            return RedirectToAction("Main", "System");
+            return RedirectToAction("Index", "Home");
             //    }
 
             //}

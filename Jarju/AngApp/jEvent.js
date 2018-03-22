@@ -70,7 +70,7 @@
         };
 })
 
-app.controller﻿("CreateEventController", function ($scope, $http, BaseService, EVENT_PATH, $timeout) {
+app.controller﻿("CreateEventController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, $timeout) {
 
     Opening();
 
@@ -79,6 +79,13 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
         $scope.DATE_FROM = new Date()
         $scope.DATE_TO = new Date()
         $scope.fileUpload = null;
+        BaseService.CallAction(SYSTEM_PATH, "GetUserID", "0")
+            .then(function (result) {
+                $scope.user = result;
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit menu type data: ' + error.message)
+            })
     }
 
     $scope.uploadCoverImage = function () {
@@ -121,7 +128,10 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
 
             BaseService.Message.alert('กรุณากรอกข้อมูลให้ครบถ้วน');
             return;
-        } else {
+        } else if ($scope.user == null) {
+            BaseService.Message.alert('กรุณาล็อกอิน');
+        }
+        else {
             let scopeData = $scope.formData.Event;
             let data = $.param(scopeData)
 

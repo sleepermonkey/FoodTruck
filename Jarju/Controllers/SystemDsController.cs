@@ -27,5 +27,13 @@ namespace Jarju.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public ContentResult GetUserID()
+        {
+            if (Session[Cons.SS_USER_ID] != null)
+                return Content(Session[Cons.SS_USER_ID].ToString());
+            else
+                return Content("");
+        }
+
     }
 }
