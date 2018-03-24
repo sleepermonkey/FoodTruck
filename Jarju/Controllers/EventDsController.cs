@@ -29,37 +29,44 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        public ContentResult SubmitEvent()
+        public JsonResult SubmitEvent()
         {
             DataTable dt = new DataTable();
+            string ID = "0";
 
             gSQL = "EXEC [dbo].[sp_Event_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
             gSQL = String.Format(gSQL
                                 , Request.Form["EVENT_ID"]
                                 , Request.Form["EVENT_NAME"]
                                 , Request.Form["EVENT_PLACE"]
-                                , Request.Form["START_DATE"]
-                                , Request.Form["END_DATE"]
+                                , ismoUtil.ConvertAngularDateTo120(Request.Form["START_DATE"].ToString())
+                                , ismoUtil.ConvertAngularDateTo120(Request.Form["END_DATE"].ToString())
                                 , Request.Form["DESCRIPTION"]
                                 , Session[Cons.SS_USER_ID].ToString());
-            Response.Write(gSQL);
-            Response.End();
+            //Response.Write(gSQL); <---- use for push string to AngularJS
+            //Response.End();
             dt = odb.SqlQuery(gSQL, mDBName);
 
-            return Content("Done");
+            if (Request.Form["EVENT_ID"] == "0" || Request.Form["EVENT_ID"] == "")
+                ID = dt.Rows[0]["EVENT_ID"].ToString();
+            else
+                ID = Request.Form["EVENT_ID"];
 
+            gSQL = "EXEC [sp_Event_List] {0}";
+            gSQL = String.Format(gSQL,ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult UploadCoverImage(HttpPostedFileBase File, string periodMonth = "00", string periodYear = "00")
+        public JsonResult UploadCoverImage(HttpPostedFileBase File, string ID)
         {
-
             if (File != null && File.ContentLength > 0)
             {
-
                 // Write file to Server
                 string gFileName = File.FileName;
-                string uploadLocationStr = "~/upload/Leasing/DataPeriod/" + periodYear + "/" + periodMonth + "/";
+                string uploadLocationStr = "/Upload/Event/Cover/" + ID + "/";
                 string uploadLocation = Server.MapPath(uploadLocationStr);
                 string fileLocation = uploadLocationStr + gFileName;
 
@@ -68,60 +75,11 @@ namespace FoodTruck.Controllers
                                                 , Server.MapPath(fileLocation));
 
 
-                gSQL = String.Format("EXEC [sp_Leasing_Temp_Check] '{0}'"
-                                    , aBiz.DataService.MapUploadPath(fileLocation));
-                DataTable dt0 = odb.SqlQuery(gSQL, mDBName);
-
-
-                var invalidFieldList = "";
-                var invalidString = "";
-
-                foreach (DataRow dr in dt0.Rows)
-                {
-                    invalidFieldList = "";
-
-                    if (dr.Field<int>("CHASSIS_NO_PASS") == 0)
-                    {
-                        invalidFieldList = invalidFieldList + "[Serial Number] is invalid, ";
-                    }
-                    if (dr.Field<int>("APPLICATION_DATE_PASS") == 0)
-                    {
-                        invalidFieldList = invalidFieldList + "[Application Date] is invalid, ";
-                    }
-                    if (dr.Field<int>("BOOKING_DATE_PASS") == 0)
-                    {
-                        invalidFieldList = invalidFieldList + "[Booking Date] is invalid, ";
-                    }
-                    if (dr.Field<int>("CONTRACT_PASS") == 0)
-                    {
-                        invalidFieldList = invalidFieldList + "[Contract] is invalid, ";
-                    }
-                    if (dr.Field<int>("BUDGET_PASS") == 0)
-                    {
-                        invalidFieldList = invalidFieldList + "[Budget] is invalid, ";
-                    }
-
-                    if (invalidFieldList != "")
-                    {
-                        invalidString = invalidString + dr.Field<string>("CHASSIS_NO") + ": " + invalidFieldList + "\n";
-                    }
-                }
-
-                if (invalidString != "")
-                {
-                    return Json(new { result = 200, data = invalidString });
-                }
-
-                // Add data to Temp
-                gSQL = String.Format("EXEC [dbo].[sp_Leasing_Temp_Add] '{0}', '{1}', '{2}', '{3}', '{4}'"
-                                    , gFileName
-                                    , aBiz.DataService.MapUploadPath(fileLocation)
-                                    , fileLocation
-                                    , periodMonth
-                                    , periodYear);
-
+                //gSQL = String.Format("EXEC [sp_Leasing_Temp_Check] '{0}'"
+                gSQL = String.Format("EXEC [sp_Event_Cover_Upload] '{0}','{1}'"
+                                    , ID
+                                    , fileLocation);
                 DataTable dt = odb.SqlQuery(gSQL, mDBName);
-
 
                 return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
 
