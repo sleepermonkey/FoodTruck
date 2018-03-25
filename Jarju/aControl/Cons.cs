@@ -15,8 +15,8 @@ namespace FoodTruck.aControl
         public const string SS_USER_LANG = "ssUserLang";
 
 
-        //-------------- Campaign Session --------------------------
-        public const string SS_PERIOD_ID = "ssCM1";
+        //-------------- Event Session --------------------------
+        public const string SS_EVENT_ID = "0";
 
 
         //-------------- MLL Session --------------------------

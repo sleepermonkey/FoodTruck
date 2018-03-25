@@ -1350,6 +1350,7 @@
     <Content Include="Views\Operation\Calendar.cshtml" />
     <Content Include="Views\Operation\TestGrid.cshtml" />
     <Content Include="Views\Event\CreateEvent.cshtml" />
+    <Content Include="Views\Event\ManageEvent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

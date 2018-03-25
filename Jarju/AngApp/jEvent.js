@@ -89,6 +89,14 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit menu type data: ' + error.message)
             })
+
+        BaseService.CallAction(EVENT_PATH, "GetEventList", null)
+            .then(function (result) {
+                $scope.formData.Event = result[0];
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
     }
 
     function uploadCoverImage() {
@@ -178,6 +186,78 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
     $scope.startDate_Change = function () {
         if ($scope.formData.Event.START_DATE > $scope.formData.Event.END_DATE)
             $scope.formData.Event.START_DATE = $scope.formData.Event.END_DATE;
+    }
+
+    String.prototype.trunc = String.prototype.trunc ||
+        function (n) {
+            return this.split(',')[0];
+        };
+})
+
+app.controller﻿("ManageEventController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, $timeout) {
+
+    Opening();
+
+    function Opening() {
+        $scope.ListHeader = {};
+        $scope.formData = {};
+        GetHeader();
+        GetData();
+    }
+
+    function GetHeader() {
+        BaseService.GetHeaderGridView("EventList")
+            .then(function (result) {
+                $scope.ListHeader = result
+                console.log(result)
+            }, function (error) {
+                console.log('Unable to load event header data: ' + error.message)
+            })
+    }
+
+    function GetData() {
+        BaseService.GetDataTable(EVENT_PATH, "GetEventList")
+            .then(function (result) {
+                console.log(result);
+                $scope.ListDetail = result;
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+    }
+
+    $scope.OrderColumn = function (pColName) {
+        $scope.sortType = pColName;
+        $scope.sortReverse = !$scope.sortReverse;
+    };
+
+    $scope.CheckPagination = function () {
+        if (($scope.FILTER.EVENT_ID != null && $scope.FILTER.EVENT_ID != '') ||
+            ($scope.FILTER.EVENT_NAME != null && $scope.FILTER.EVENT_NAME != '') ||
+            ($scope.FILTER.EVENT_PLACE != null && $scope.FILTER.EVENT_PLACE != '')) {
+            document.getElementById('PaginationDiv').style.visibility = "hidden";
+        } else {
+            document.getElementById('PaginationDiv').style.visibility = "visible";
+        }
+    };
+
+    $scope.ShowItem_Click = function (ID) {
+        document.getElementById('DetailModal').style.display = 'block';
+        var sendData = [{ "ID": ID }];
+        var data = $.param(sendData[0]);
+
+        BaseService.CallAction(OPERATION_PATH, "GetCustomerList", data)
+            .then(function (result) {
+                $scope.formData.Customer = result[0];
+            }, function (error) {
+                console.log('Unable to load customer data: ' + error.message)
+            });
+    }
+
+    $scope.CloseItem_Click = function (ID) {
+        document.getElementById('DetailModal').style.display = 'none';
+    }
+
+    $scope.Edit_Submit = function () {
     }
 
     String.prototype.trunc = String.prototype.trunc ||
