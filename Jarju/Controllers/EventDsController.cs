@@ -21,22 +21,27 @@ namespace FoodTruck.Controllers
         {
             DataTable dt = new DataTable();
 
-            if (Session[Cons.SS_EVENT_ID] == null || Session[Cons.SS_EVENT_ID].ToString() == "0")
-            {
-                gSQL = "EXEC [sp_Event_List] {0}";
-                gSQL = String.Format(gSQL,
-                            (Request.Form["ID"] != null && Request.Form["ID"] != "") ? "'" + Request.Form["ID"] + "'" : "null");
-                dt = odb.SqlQuery(gSQL, mDBName);
-            }
-            else
+            gSQL = "EXEC [sp_Event_List] {0}";
+            gSQL = String.Format(gSQL,
+                        (Request.Form["ID"] != null && Request.Form["ID"] != "") ? "'" + Request.Form["ID"] + "'" : "null");
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetEvent()
+        {
+            DataTable dt = new DataTable();
+
+            if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
             {
                 gSQL = "EXEC [sp_Event_List] {0}";
                 gSQL = String.Format(gSQL,
                              Session[Cons.SS_EVENT_ID].ToString());
                 dt = odb.SqlQuery(gSQL, mDBName);
-                Session[Cons.SS_EVENT_ID] = "0";
+                Session[Cons.SS_EVENT_ID] = null;
             }
-            
+
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }

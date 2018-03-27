@@ -1351,6 +1351,7 @@
     <Content Include="Views\Operation\TestGrid.cshtml" />
     <Content Include="Views\Event\CreateEvent.cshtml" />
     <Content Include="Views\Event\ManageEvent.cshtml" />
+    <Content Include="Views\Event\EventFloorPlan.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

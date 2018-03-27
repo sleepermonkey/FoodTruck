@@ -22,6 +22,13 @@ namespace Jarju.Controllers
             return View();
         }
 
+        public ActionResult EventFloorPlan(string id)
+        {
+            ViewBag.PageTitle = "Event Floor Plan";
+            Session[Cons.SS_EVENT_ID] = id;
+            return View();
+        }
+
         public ActionResult MenuType()
         {
             ViewBag.PageTitle = "Menu Type";

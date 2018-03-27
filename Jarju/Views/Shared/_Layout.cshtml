@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARJU : @ViewBag.Title</title>
+    <title>Food Truck : @ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <link href="~/Content/ui-bootstrap-csp.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
                     Event
                 </button>
                 <div class="dropdown-content">
-                    <a href="@Url.Action("CreateEvent", "Event")" style="font-size:9pt">Create</a>
+                    <a href="/Event/CreateEvent" style="font-size:9pt">Create</a>
                     <a href="@Url.Action("ManageEvent", "Event")" style="font-size:9pt">Manage</a>
                     <a href="#">Link 3</a>
                 </div>

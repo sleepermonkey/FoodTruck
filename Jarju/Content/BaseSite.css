@@ -1083,6 +1083,10 @@ a.pointer-link {
     background-color: aqua;
 }
 
+.activeOver {
+    background-color: aquamarine;
+}
+
 .inactive {
     background-color: none;
 }

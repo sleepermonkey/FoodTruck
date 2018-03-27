@@ -63,14 +63,9 @@
     $scope.popupEndDate = {
         opened: false
     }
-    
-    String.prototype.trunc = String.prototype.trunc ||
-        function (n) {
-            return this.split(',')[0];
-        };
 })
 
-app.controller﻿("CreateEventController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, Upload, $timeout) {
+app.controller﻿("CreateEventController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, Upload, $window, $timeout) {
 
     Opening();
 
@@ -90,7 +85,7 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
                 console.log('Unable to edit menu type data: ' + error.message)
             })
 
-        BaseService.CallAction(EVENT_PATH, "GetEventList", null)
+        BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
                 $scope.formData.Event = result[0];
             }, function (error) {
@@ -167,6 +162,10 @@ app.controller﻿("CreateEventController", function ($scope, $http, BaseService,
         }
     }
 
+    $scope.editEventPlan = function () {
+        $window.location = '/Event/EventFloorPlan/' + $scope.formData.Event.EVENT_ID;
+    }
+
     $scope.openStartDate = function () {
         $scope.popupStartDate.opened = true;
     }
@@ -239,29 +238,125 @@ app.controller﻿("ManageEventController", function ($scope, $http, BaseService,
             document.getElementById('PaginationDiv').style.visibility = "visible";
         }
     };
+})
 
-    $scope.ShowItem_Click = function (ID) {
-        document.getElementById('DetailModal').style.display = 'block';
-        var sendData = [{ "ID": ID }];
-        var data = $.param(sendData[0]);
+app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, OPERATION_PATH, $timeout) {
 
-        BaseService.CallAction(OPERATION_PATH, "GetCustomerList", data)
-            .then(function (result) {
-                $scope.formData.Customer = result[0];
-            }, function (error) {
-                console.log('Unable to load customer data: ' + error.message)
+    Opening();
+
+    function Opening() {
+        $scope.drawMode = 0;
+        $scope.ObjectType = 0;
+        $scope.ObjectOrientation = 0;
+        $scope.ObjectWidth = 5;
+        $scope.ObjectDepth = 2;
+        $scope.selectedPosition = []
+    }
+
+    $scope.setObjectType = function (type) {
+        $scope.ObjectType = type;
+    }
+
+    $scope.setDrawMode = function (mode) {
+        $scope.drawMode = mode;
+    }
+
+    $scope.switchOrientation = function () {
+        var tmp = $scope.ObjectWidth;
+        $scope.ObjectWidth = $scope.ObjectDepth;
+        $scope.ObjectDepth = tmp;
+    }
+
+    $scope.mouseOverPosition = function ($parentIndex, $index) {
+        if ($scope.drawMode == 1) {
+            for (var i = 0; i < $scope.ObjectDepth; i++) {
+                for (var j = 0; j < $scope.ObjectWidth; j++) {
+                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.add('activeOver');
+                }
+            }
+        } else {
+            document.getElementById($parentIndex + "," + $index).classList.add('activeOver');
+        }
+    }
+
+    $scope.mouseLeavePosition = function ($parentIndex, $index) {
+        if ($scope.drawMode == 1) {
+            for (var i = 0; i < $scope.ObjectDepth; i++) {
+                for (var j = 0; j < $scope.ObjectWidth; j++) {
+                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.remove('activeOver');
+                }
+            }
+        } else {
+            document.getElementById($parentIndex + "," + $index).classList.remove('activeOver');
+        }
+    }
+
+    $scope.selectPosition = function ($parentIndex, $index) {
+        if ($scope.drawMode == 1) {
+            for (var i = 0; i < $scope.ObjectDepth; i++) {
+                for (var j = 0; j < $scope.ObjectWidth; j++) {
+                    $scope.selectedPosition.push({
+                        parent: parseInt($parentIndex + i),
+                        index: parseInt($index + j)
+                    });
+                }
+            }
+
+        } else if ($scope.drawMode == 0) {
+            for (var i = 0; i < $scope.selectedPosition.length; i++) {
+                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+                    $scope.selectedPosition.splice(i, 1);
+                    return;
+                }
+            }
+
+            $scope.selectedPosition.push({
+                parent: $parentIndex,
+                index: $index
             });
+        }
+        else {
+            for (var i = 0; i < $scope.selectedPosition.length; i++) {
+                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+                    $scope.selectedPosition.splice(i, 1);
+                    return;
+                }
+            }
+        }
     }
 
-    $scope.CloseItem_Click = function (ID) {
-        document.getElementById('DetailModal').style.display = 'none';
+    $scope.dragOverPosition = function ($parentIndex, $index) {
+        if ($scope.drawMode == 0) {
+            for (var i = 0; i < $scope.selectedPosition.length; i++) {
+                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+                    return;
+                }
+            }
+
+            $scope.selectedPosition.push({
+                parent: $parentIndex,
+                index: $index
+            });
+        } else if ($scope.drawMode == 2) {
+            for (var i = 0; i < $scope.selectedPosition.length; i++) {
+                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+                    $scope.selectedPosition.splice(i, 1);
+                    return;
+                }
+            }
+        }
     }
 
-    $scope.Edit_Submit = function () {
+    $scope.CheckActivePosition = function ($parentIndex, $index) {
+        for (var i = 0; i < $scope.selectedPosition.length; i++) {
+            if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    String.prototype.trunc = String.prototype.trunc ||
-        function (n) {
-            return this.split(',')[0];
-        };
+    $scope.handleDrop = function (item, bin) {
+        $scope.dragOverPosition(bin.split(',')[0], bin.split(',')[1]);
+    }
 })

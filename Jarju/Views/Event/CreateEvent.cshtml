@@ -12,6 +12,9 @@
                 <button type="button" class="btn btn-primary" ng-click="submitEvent()">
                     <span class="glyphicon glyphicon-floppy-save"></span> Save
                 </button>
+                <button type="button" class="btn btn-primary" ng-click="editEventPlan()" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0">
+                    <span class="glyphicon glyphicon-tent"></span> Event Floor Plan
+                </button>
             </div>
         </div>
         <div id="EditItem" class="row">
@@ -88,7 +91,7 @@
                     <tbody style="height:auto;">
                         <tr class="sm-table-row">
                             <td class="tblDetail">
-                                <img ng-src="{{formData.Event.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
+                                <img ng-src="{{formData.Event.COVER_PATH}}" style="max-width: 100%;max-height: 300px;" />
                             </td>
                         </tr>
                         <tr class="sm-table-row">
@@ -97,7 +100,7 @@
                                     <div class="col-md-8" style="font-size:medium;">
                                         File : {{fileUpload.name}}
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" align="right">
                                         <label class="btn btn-success btn-file">
                                             <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
                                             Browse<input type="file"
