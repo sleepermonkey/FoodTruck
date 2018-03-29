@@ -107,6 +107,35 @@ namespace FoodTruck.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult UploadPlanImage(HttpPostedFileBase File, string ID)
+        {
+            if (File != null && File.ContentLength > 0)
+            {
+                // Write file to Server
+                string gFileName = File.FileName;
+                string uploadLocationStr = "/Upload/Event/Plan/" + ID + "/";
+                string uploadLocation = Server.MapPath(uploadLocationStr);
+                string fileLocation = uploadLocationStr + gFileName;
+
+                DataService.UploadFileByLocation(File
+                                                , uploadLocation
+                                                , Server.MapPath(fileLocation));
+
+                gSQL = String.Format("EXEC [sp_Event_Plan_Upload] '{0}','{1}'"
+                                    , ID
+                                    , fileLocation);
+                DataTable dt = odb.SqlQuery(gSQL, mDBName);
+
+                return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+
+            }
+            else
+            {
+                return Json(new { result = 500 });
+            }
+        }
+
         public JsonResult UpdateCustomerData()
         {
             DataTable dt = new DataTable();

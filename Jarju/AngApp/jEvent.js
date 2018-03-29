@@ -240,7 +240,7 @@ app.controller﻿("ManageEventController", function ($scope, $http, BaseService,
     };
 })
 
-app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, OPERATION_PATH, $timeout) {
+app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, EVENT_PATH, Upload, $timeout) {
 
     Opening();
 
@@ -250,7 +250,19 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, O
         $scope.ObjectOrientation = 0;
         $scope.ObjectWidth = 5;
         $scope.ObjectDepth = 2;
-        $scope.selectedPosition = []
+        $scope.ObjectPosition = [];
+        $scope.fileUpload = null;
+
+        $scope.formData = {};
+        $scope.formData.Event = {};
+
+        BaseService.CallAction(EVENT_PATH, "GetEvent", null)
+            .then(function (result) {
+                $scope.formData.Event = result[0];
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
     }
 
     $scope.setObjectType = function (type) {
@@ -268,57 +280,84 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, O
     }
 
     $scope.mouseOverPosition = function ($parentIndex, $index) {
+
+        var activeClass = '';
+        if ($scope.ObjectType == 0) {
+            activeClass = 'activeFoodTruckOver';
+        } else if ($scope.ObjectType == 1) {
+            activeClass = 'activeStageOver';
+        } else if ($scope.ObjectType == 2) {
+            activeClass = 'activeWallOver';
+        }
+
         if ($scope.drawMode == 1) {
             for (var i = 0; i < $scope.ObjectDepth; i++) {
                 for (var j = 0; j < $scope.ObjectWidth; j++) {
-                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.add('activeOver');
+                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.add(activeClass);
                 }
             }
         } else {
-            document.getElementById($parentIndex + "," + $index).classList.add('activeOver');
+            document.getElementById($parentIndex + "," + $index).classList.add(activeClass);
         }
     }
 
     $scope.mouseLeavePosition = function ($parentIndex, $index) {
+
+        var activeClass = '';
+        if ($scope.ObjectType == 0) {
+            activeClass = 'activeFoodTruckOver';
+        } else if ($scope.ObjectType == 1) {
+            activeClass = 'activeStageOver';
+        } else if ($scope.ObjectType == 2) {
+            activeClass = 'activeWallOver';
+        }
+
         if ($scope.drawMode == 1) {
             for (var i = 0; i < $scope.ObjectDepth; i++) {
                 for (var j = 0; j < $scope.ObjectWidth; j++) {
-                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.remove('activeOver');
+                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.remove(activeClass);
                 }
             }
         } else {
-            document.getElementById($parentIndex + "," + $index).classList.remove('activeOver');
+            document.getElementById($parentIndex + "," + $index).classList.remove(activeClass);
         }
     }
 
     $scope.selectPosition = function ($parentIndex, $index) {
-        if ($scope.drawMode == 1) {
-            for (var i = 0; i < $scope.ObjectDepth; i++) {
-                for (var j = 0; j < $scope.ObjectWidth; j++) {
-                    $scope.selectedPosition.push({
-                        parent: parseInt($parentIndex + i),
-                        index: parseInt($index + j)
-                    });
-                }
-            }
-
-        } else if ($scope.drawMode == 0) {
-            for (var i = 0; i < $scope.selectedPosition.length; i++) {
-                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
-                    $scope.selectedPosition.splice(i, 1);
+        if ($scope.drawMode == 0) {
+            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                    $scope.ObjectPosition.splice(i, 1);
                     return;
                 }
             }
 
-            $scope.selectedPosition.push({
+            $scope.ObjectPosition.push({
                 parent: $parentIndex,
-                index: $index
+                index: $index,
+                ObjectType: $scope.ObjectType
             });
-        }
-        else {
-            for (var i = 0; i < $scope.selectedPosition.length; i++) {
-                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
-                    $scope.selectedPosition.splice(i, 1);
+        } else if ($scope.drawMode == 1) {
+            for (var i = 0; i < $scope.ObjectDepth; i++) {
+               for (var j = 0; j < $scope.ObjectWidth; j++) {
+                    for (var k = 0; k < $scope.ObjectPosition.length; k++) {
+                        if ($scope.ObjectPosition[k].index == parseInt($index + j) && $scope.ObjectPosition[k].parent == parseInt($parentIndex + i)) {
+                            $scope.ObjectPosition.splice(k, 1);
+                            break;
+                        }
+                    }
+
+                    $scope.ObjectPosition.push({
+                        parent: parseInt($parentIndex + i),
+                        index: parseInt($index + j),
+                        ObjectType: $scope.ObjectType
+                    });
+                }
+            }
+        } else {
+            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                    $scope.ObjectPosition.splice(i, 1);
                     return;
                 }
             }
@@ -327,20 +366,22 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, O
 
     $scope.dragOverPosition = function ($parentIndex, $index) {
         if ($scope.drawMode == 0) {
-            for (var i = 0; i < $scope.selectedPosition.length; i++) {
-                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
+            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
                     return;
                 }
             }
 
-            $scope.selectedPosition.push({
+            $scope.ObjectPosition.push({
                 parent: $parentIndex,
-                index: $index
+                index: $index,
+                ObjectType: $scope.ObjectType
             });
+            
         } else if ($scope.drawMode == 2) {
-            for (var i = 0; i < $scope.selectedPosition.length; i++) {
-                if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
-                    $scope.selectedPosition.splice(i, 1);
+            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                    $scope.ObjectPosition.splice(i, 1);
                     return;
                 }
             }
@@ -348,15 +389,56 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, O
     }
 
     $scope.CheckActivePosition = function ($parentIndex, $index) {
-        for (var i = 0; i < $scope.selectedPosition.length; i++) {
-            if ($scope.selectedPosition[i].index == $index && $scope.selectedPosition[i].parent == $parentIndex) {
-                return true;
+        for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+            if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                return $scope.ObjectPosition[i].ObjectType;
             }
         }
-        return false;
+
+        return '-1';
     }
 
     $scope.handleDrop = function (item, bin) {
         $scope.dragOverPosition(bin.split(',')[0], bin.split(',')[1]);
+    }
+
+    $scope.uploadPlanImage = function () {
+
+        var file = $scope.fileUpload;
+
+        $scope.fileName = file.name;
+        $scope.ListDetail = null;
+
+        file.upload = Upload.upload({
+            url: window.location.origin + EVENT_PATH + '/UploadPlanImage',
+            data: { File: file, ID: $scope.formData.Event.EVENT_ID },
+        });
+
+        file.upload.then(function (res) {
+            $timeout(function () {
+                if (res.data.result == 500) {
+                    BaseService.Message.alert("Please insert file.");
+                } else if (res.data.result == 200) {
+                    BaseService.Message.alert((res.data.data));
+                } else {
+                    $scope.formData.Event.PLAN_PATH = "/Upload/Event/Plan/" +
+                        $scope.formData.Event.EVENT_ID + "/" +
+                        $scope.fileName;
+                    //BaseService.Message.alert("บันทึกข้อมูลสำเร็จ");
+                    BaseService.Message.alert($scope.formData.Event.COVER_PATH);
+                }
+            })
+        }, function (res) {
+            if (res.status > 0) {
+                $scope.errorMsg = res.status + ': ' + res.data;
+                BaseService.Message.alert("Cannot upload file")
+            }
+        }, function (evt) {
+            file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+        });
+    };
+
+    $scope.planSubmit = function () {
+
     }
 })

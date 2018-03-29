@@ -1075,16 +1075,32 @@ a.pointer-link {
 }
 
 .theme {
-    background: url(img/3_3.png);
     background-repeat: no-repeat;
+    background-size: contain;
 }
 
-.active {
+.activeFoodTruck {
     background-color: aqua;
 }
 
-.activeOver {
+.activeFoodTruckOver {
     background-color: aquamarine;
+}
+
+.activeStage {
+    background-color: darkred;
+}
+
+.activeStageOver {
+    background-color: firebrick;
+}
+
+.activeWall {
+    background-color: coral;
+}
+
+.activeWallOver {
+    background-color: lightsalmon;
 }
 
 .inactive {
