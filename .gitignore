@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /Jarju/Upload/Event/Cover
+/Jarju/Upload/Event/Plan/15

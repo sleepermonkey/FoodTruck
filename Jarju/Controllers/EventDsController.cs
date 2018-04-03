@@ -76,6 +76,22 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult SubmitPlan()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Plan_Submit] '{0}','{1}','{2}','{3}','{4}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["WIDTH"]
+                                , Request.Form["DEPTH"]
+                                , Request.Form["GRID_SIZE"]
+                                , Session[Cons.SS_USER_ID].ToString());
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public JsonResult UploadCoverImage(HttpPostedFileBase File, string ID)
         {

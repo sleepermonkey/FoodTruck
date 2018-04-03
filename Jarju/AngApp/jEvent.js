@@ -248,6 +248,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.drawMode = 0;
         $scope.ObjectType = 0;
         $scope.ObjectOrientation = 0;
+        $scope.gridRow = 64;
+        $scope.gridColumn = 64;
         $scope.ObjectWidth = 5;
         $scope.ObjectDepth = 2;
         $scope.ObjectPosition = [];
@@ -255,6 +257,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
         $scope.formData = {};
         $scope.formData.Event = {};
+        $scope.formData.Event.PLAN_PATH = '';
 
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
@@ -328,7 +331,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             for (var i = 0; i < $scope.ObjectPosition.length; i++) {
                 if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
                     $scope.ObjectPosition.splice(i, 1);
-                    return;
+                    break;
                 }
             }
 
@@ -406,6 +409,9 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
         var file = $scope.fileUpload;
 
+        if (file == null)
+            return;
+
         $scope.fileName = file.name;
         $scope.ListDetail = null;
 
@@ -438,7 +444,28 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         });
     };
 
-    $scope.planSubmit = function () {
+    $scope.calculateGrid = function () {
+        if ($scope.formData.Event.WIDTH != null && $scope.formData.Event.WIDTH > 0 && $scope.formData.Event.GRID_SIZE > 0) {
+            $scope.gridColumn = $scope.formData.Event.WIDTH / $scope.formData.Event.GRID_SIZE;
+        }
 
+        if ($scope.formData.Event.DEPTH != null && $scope.formData.Event.DEPTH > 0 && $scope.formData.Event.GRID_SIZE > 0) {
+            $scope.gridRow = $scope.formData.Event.DEPTH / $scope.formData.Event.GRID_SIZE;
+        }
+    }
+
+    $scope.planSubmit = function () {
+        let scopeData = $scope.formData.Event;
+        let data = $.param(scopeData)
+
+        BaseService.CallAction(EVENT_PATH, "SubmitPlan", data)
+            .then(function (result) {
+                $scope.formData.Event = result[0];
+                BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
     }
 })
