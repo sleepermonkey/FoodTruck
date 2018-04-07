@@ -240,7 +240,7 @@ app.controller﻿("ManageEventController", function ($scope, $http, BaseService,
     };
 })
 
-app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, EVENT_PATH, Upload, $timeout) {
+app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, EVENT_PATH, Upload, $timeout, $filter) {
 
     Opening();
 
@@ -250,9 +250,12 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.ObjectOrientation = 0;
         $scope.gridRow = 64;
         $scope.gridColumn = 64;
-        $scope.ObjectWidth = 5;
-        $scope.ObjectDepth = 2;
+        $scope.gridWidth = '10px';
+        $scope.gridHeight = '10px';
+        $scope.ObjectWidth = 6;
+        $scope.ObjectDepth = 3;
         $scope.ObjectPosition = [];
+        $scope.ObjectGroup = [];
         $scope.fileUpload = null;
 
         $scope.formData = {};
@@ -262,6 +265,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
                 $scope.formData.Event = result[0];
+                $scope.calculateGrid();
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
@@ -338,7 +342,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             $scope.ObjectPosition.push({
                 parent: $parentIndex,
                 index: $index,
-                ObjectType: $scope.ObjectType
+                ObjectType: $scope.ObjectType,
+                ObjectGroup: 0
             });
         } else if ($scope.drawMode == 1) {
             for (var i = 0; i < $scope.ObjectDepth; i++) {
@@ -353,7 +358,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     $scope.ObjectPosition.push({
                         parent: parseInt($parentIndex + i),
                         index: parseInt($index + j),
-                        ObjectType: $scope.ObjectType
+                        ObjectType: $scope.ObjectType,
+                        ObjectGroup: 0
                     });
                 }
             }
@@ -378,7 +384,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             $scope.ObjectPosition.push({
                 parent: $parentIndex,
                 index: $index,
-                ObjectType: $scope.ObjectType
+                ObjectType: $scope.ObjectType,
+                ObjectGroup: 0
             });
             
         } else if ($scope.drawMode == 2) {
@@ -445,18 +452,32 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     };
 
     $scope.calculateGrid = function () {
-        if ($scope.formData.Event.WIDTH != null && $scope.formData.Event.WIDTH > 0 && $scope.formData.Event.GRID_SIZE > 0) {
-            $scope.gridColumn = $scope.formData.Event.WIDTH / $scope.formData.Event.GRID_SIZE;
+
+        var gridSize = 0;
+        if ($scope.formData.Event.GRID_SIZE == 0) {
+            $scope.gridWidth = '5px';
+            $scope.gridHeight = '5px';
+            gridSize = 0.5;
+        } else {
+            $scope.gridWidth = '10px';
+            $scope.gridHeight = '10px';
+            gridSize = 1;
         }
 
-        if ($scope.formData.Event.DEPTH != null && $scope.formData.Event.DEPTH > 0 && $scope.formData.Event.GRID_SIZE > 0) {
-            $scope.gridRow = $scope.formData.Event.DEPTH / $scope.formData.Event.GRID_SIZE;
+        if ($scope.formData.Event.WIDTH != null && $scope.formData.Event.WIDTH > 0) {
+            $scope.gridColumn = $scope.formData.Event.WIDTH / gridSize;
+            document.getElementById("PlanGrid").style.width = $scope.gridColumn + "px";
+        }
+
+        if ($scope.formData.Event.DEPTH != null && $scope.formData.Event.DEPTH > 0) {
+            $scope.gridRow = $scope.formData.Event.DEPTH / gridSize;
+            document.getElementById("PlanGrid").style.height = $scope.gridRow + "px";
         }
     }
 
     $scope.planSubmit = function () {
-        let scopeData = $scope.formData.Event;
-        let data = $.param(scopeData)
+        /*let scopeData = $scope.formData.Event;
+        let data = $.param(scopeData);
 
         BaseService.CallAction(EVENT_PATH, "SubmitPlan", data)
             .then(function (result) {
@@ -466,6 +487,46 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
-            })
+            })*/
+
+        $scope.groupingObject();
+
+        /*scopeData = $scope.ObjectPosition;
+        data = $.param(scopeData);
+        BaseService.CallAction(EVENT_PATH, "SubmitPlanObject", data)
+            .then(function (result) {
+                $scope.formData.Event = result[0];
+                BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })*/
+    }
+
+    $scope.groupingObject = function () {
+        var FoodTruckNumber = 0;
+        var _objectPosition = angular.copy($scope.ObjectPosition);
+        for (var i = 0; i < $scope.gridRow; i++) {
+            for (var j = 0; j < $scope.gridColumn; j++) {
+                var _obj = $filter('filter')(_objectPosition, { 'index': j, 'parent': i }, true)
+                if (_obj.length > 0) {
+                    if (_obj[0].ObjectGroup == 0)
+                        FoodTruckNumber++;
+                    _obj[0].ObjectGroup = FoodTruckNumber;
+
+                    var _obj2 = $filter('filter')(_objectPosition, { 'index': j + 1, 'parent': i }, true)
+                    if (_obj2.length > 0) {
+                        _obj2[0].ObjectGroup = FoodTruckNumber;
+                    }
+
+                    var _obj2 = $filter('filter')(_objectPosition, { 'index': j, 'parent': i + 1 }, true)
+                    if (_obj2.length > 0) {
+                        _obj2[0].ObjectGroup = FoodTruckNumber;
+                    }
+                }
+            }
+        }
+        alert(FoodTruckNumber)
     }
 })
