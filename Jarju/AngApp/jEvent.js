@@ -261,11 +261,33 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.formData = {};
         $scope.formData.Event = {};
         $scope.formData.Event.PLAN_PATH = '';
+        $scope.formData.Shop = {};
 
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
                 $scope.formData.Event = result[0];
                 $scope.calculateGrid();
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
+
+        BaseService.CallAction(EVENT_PATH, "GetPlan", null)
+            .then(function (result) {
+                $scope.formData.Shop = result;
+                for (var i = 0; i < $scope.formData.Shop.length; i++) {
+                    var _ftString = $scope.formData.Shop[i].SHOP_POSITION;
+                    var _ftSplit = _ftString.split("|");
+                    for (var j = 0; j < _ftSplit.length; j++) {
+                        $scope.ObjectPosition.push({
+                            parent: _ftSplit[j].split(",")[1],
+                            index: _ftSplit[j].split(",")[0],
+                            ObjectType: 0,
+                            ObjectGroup: 0
+                        });
+                    }
+                }
+
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
@@ -476,7 +498,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     }
 
     $scope.planSubmit = function () {
-        /*let scopeData = $scope.formData.Event;
+        let scopeData = $scope.formData.Event;
         let data = $.param(scopeData);
 
         BaseService.CallAction(EVENT_PATH, "SubmitPlan", data)
@@ -487,46 +509,148 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
-            })*/
+            })
 
-        $scope.groupingObject();
-
-        /*scopeData = $scope.ObjectPosition;
-        data = $.param(scopeData);
-        BaseService.CallAction(EVENT_PATH, "SubmitPlanObject", data)
-            .then(function (result) {
-                $scope.formData.Event = result[0];
-                BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
-
-            }, function (error) {
-                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
-                console.log('Unable to edit event data: ' + error.message)
-            })*/
-    }
-
-    $scope.groupingObject = function () {
-        var FoodTruckNumber = 0;
-        var _objectPosition = angular.copy($scope.ObjectPosition);
-        for (var i = 0; i < $scope.gridRow; i++) {
-            for (var j = 0; j < $scope.gridColumn; j++) {
-                var _obj = $filter('filter')(_objectPosition, { 'index': j, 'parent': i }, true)
-                if (_obj.length > 0) {
-                    if (_obj[0].ObjectGroup == 0)
-                        FoodTruckNumber++;
-                    _obj[0].ObjectGroup = FoodTruckNumber;
-
-                    var _obj2 = $filter('filter')(_objectPosition, { 'index': j + 1, 'parent': i }, true)
-                    if (_obj2.length > 0) {
-                        _obj2[0].ObjectGroup = FoodTruckNumber;
-                    }
-
-                    var _obj2 = $filter('filter')(_objectPosition, { 'index': j, 'parent': i + 1 }, true)
-                    if (_obj2.length > 0) {
-                        _obj2[0].ObjectGroup = FoodTruckNumber;
-                    }
+        var FoodTruckNumber = groupingObject();
+        var error = false;
+        for (var i = 1; i <= FoodTruckNumber; i++) {
+            var _ft = $filter('filter')($scope.ObjectPosition, { 'ObjectGroup': i }, true)
+            var _ftString = ''
+            if (_ft.length > 0) {
+                for (var j = 0; j < _ft.length; j++) {
+                    _ftString += _ft[j].index + ',' + _ft[j].parent + '|'; 
                 }
             }
+            _ftString = _ftString.substring(0, _ftString.length - 1);
+
+            $scope.formData.Shop = {
+                LOCAL_ID: i,
+                EVENT_ID: $scope.formData.Event.EVENT_ID,
+                NAME: '',
+                PRICE: '',
+                DEPOSIT: '',
+                FT: _ftString
+            };
+            scopeData = $scope.formData.Shop;
+            data = $.param(scopeData);
+            BaseService.CallAction(EVENT_PATH, "SubmitPlanShop", data)
+                .then(function (result) {
+                    $scope.formData.Event = result[0];
+
+                }, function (error) {
+                    error = true;
+                    console.log('Unable to edit plan shop data: ' + error.message)
+                })
         }
-        alert(FoodTruckNumber)
+        if (error)
+            BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลจุดจอดได้');
+    }
+
+    function groupingObject() {
+        angular.forEach($scope.ObjectPosition, function (item) { item.ObjectGroup = 0; });
+        var itemsSorted = $filter('orderBy')($scope.ObjectPosition, ['index','parent'])
+        var FoodTruckNumber = 0;
+        for (var i = 0; i < itemsSorted.length; i++) {
+            var _ft = itemsSorted[i];
+            var x = -1;
+            for (var j = 1; j < $scope.gridColumn; j++) {
+                var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index) + j, 'parent': parseInt(_ft.parent) }, true)
+                if (_ft2.length > 0) {
+                    if (_ft2[0].ObjectGroup != 0) {
+                        x = _ft2[0].ObjectGroup;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            for (var j = 1; j < $scope.gridColumn; j++) {
+                var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index) - j, 'parent': parseInt(_ft.parent) }, true)
+                if (_ft2.length > 0) {
+                    if (_ft2[0].ObjectGroup != 0) {
+                        x = _ft2[0].ObjectGroup;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            for (var j = 1; j < $scope.gridRow; j++) {
+                var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index) , 'parent': parseInt(_ft.parent) + j }, true)
+                if (_ft2.length > 0) {
+                    if (_ft2[0].ObjectGroup != 0) {
+                        x = _ft2[0].ObjectGroup;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            for (var j = 1; j < $scope.gridRow; j++) {
+                var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index), 'parent': parseInt(_ft.parent) - j }, true)
+                if (_ft2.length > 0) {
+                    if (_ft2[0].ObjectGroup != 0) {
+                        x = _ft2[0].ObjectGroup;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            if (x == -1) {
+                FoodTruckNumber++;
+                _ft.ObjectGroup = FoodTruckNumber;
+                for (var j = 1; j < $scope.gridColumn; j++) {
+                    var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index) + j, 'parent': parseInt(_ft.parent) }, true)
+                    if (_ft2.length > 0) {
+                        if (_ft2[0].ObjectGroup == 0) {
+                            _ft2[0].ObjectGroup = FoodTruckNumber;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                for (var j = 1; j < $scope.gridColumn; j++) {
+                    var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index) - j, 'parent': parseInt(_ft.parent) }, true)
+                    if (_ft2.length > 0) {
+                        if (_ft2[0].ObjectGroup == 0) {
+                            _ft2[0].ObjectGroup = FoodTruckNumber;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                for (var j = 1; j < $scope.gridRow; j++) {
+                    var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index), 'parent': parseInt(_ft.parent) + j }, true)
+                    if (_ft2.length > 0) {
+                        if (_ft2[0].ObjectGroup == 0) {
+                            _ft2[0].ObjectGroup = FoodTruckNumber;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                for (var j = 1; j < $scope.gridRow; j++) {
+                    var _ft2 = $filter('filter')(itemsSorted, { 'index': parseInt(_ft.index), 'parent': parseInt(_ft.parent) - j }, true)
+                    if (_ft2.length > 0) {
+                        if (_ft2[0].ObjectGroup == 0) {
+                            _ft2[0].ObjectGroup = FoodTruckNumber;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                _ft.ObjectGroup = x;
+            }
+        }
+        return FoodTruckNumber;
     }
 })

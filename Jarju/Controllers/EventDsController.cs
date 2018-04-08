@@ -39,9 +39,7 @@ namespace FoodTruck.Controllers
                 gSQL = String.Format(gSQL,
                              Session[Cons.SS_EVENT_ID].ToString());
                 dt = odb.SqlQuery(gSQL, mDBName);
-                Session[Cons.SS_EVENT_ID] = null;
             }
-
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
@@ -76,33 +74,50 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetPlan()
+        {
+            DataTable dt = new DataTable();
+
+            if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
+            {
+                gSQL = "EXEC [sp_Plan] {0}";
+                gSQL = String.Format(gSQL,
+                             Session[Cons.SS_EVENT_ID].ToString());
+                dt = odb.SqlQuery(gSQL, mDBName);
+                Session[Cons.SS_EVENT_ID] = null;
+            }
+
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult SubmitPlan()
         {
             DataTable dt = new DataTable();
 
-            gSQL = "EXEC [dbo].[sp_Plan_Submit] '{0}','{1}','{2}','{3}','{4}'";
+            gSQL = "EXEC [dbo].[sp_Plan_Submit] '{0}','{1}','{2}','{3}'";
             gSQL = String.Format(gSQL
                                 , Request.Form["EVENT_ID"]
                                 , Request.Form["WIDTH"]
                                 , Request.Form["DEPTH"]
-                                , Request.Form["GRID_SIZE"]
-                                , Session[Cons.SS_USER_ID].ToString());
+                                , Request.Form["GRID_SIZE"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult SubmitPlanObject()
+        public JsonResult SubmitPlanShop()
         {
             DataTable dt = new DataTable();
 
-            gSQL = "";
+            gSQL = "EXEC [dbo].[sp_Plan_Shop_Submit] '{0}','{1}','{2}','{3}','{4}','{5}'";
             gSQL = String.Format(gSQL
+                                , Request.Form["LOCAL_ID"]
                                 , Request.Form["EVENT_ID"]
-                                , Request.Form["WIDTH"]
-                                , Request.Form["DEPTH"]
-                                , Request.Form["GRID_SIZE"]
-                                , Session[Cons.SS_USER_ID].ToString());
+                                , Request.Form["NAME"]
+                                , Request.Form["PRICE"]
+                                , Request.Form["DEPOSIT"]
+                                , Request.Form["FT"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
