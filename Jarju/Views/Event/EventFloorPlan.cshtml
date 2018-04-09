@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="FloorPlanController" style="width:100%">
-    <div class="row custom-row" style="font-size:10pt;border-bottom:solid;border-width:thin;border-color:#F0F0F0;">
+    <div class="row custom-row" style="font-size:10pt;border-bottom:solid;border-width:thin;border-color:#F0F0F0;" ng-hide="planMode != 0">
         <div class="col-md-6">
             <label class="btn btn-success btn-file">
                 <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
@@ -23,14 +23,14 @@
                 <span class="glyphicon glyphicon-upload"></span>&nbsp;
                 Upload
             </label>
-            <label class="btn btn-success btn-file" ng-click="planSubmit()">
+            <!--<label class="btn btn-success btn-file" ng-click="planSubmit()">
                 <span class="glyphicon glyphicon-save-file"></span>&nbsp;
                 Save Plan
-            </label>
+            </label>-->
         </div>
     </div>
     <div class="row custom-row" style="font-size:10pt">
-        <div class="col-sm-2" style="margin-left:10px;">
+        <div class="col-sm-2" style="margin-left:10px;" ng-hide="planMode != 0">
             <div class="row">
                 <button type="button" ng-click="setObjectType(0)" style="width:100%;"
                         ng-class="{'btn btn-primary active': ObjectType == 0, 'btn btn-primary': ObjectType != 0 }">
@@ -89,10 +89,45 @@
                 </select>
             </div>
         </div>
+        <div class="col-sm-3" style="margin-left:10px;" ng-hide="planMode == 0">
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    No. :
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.LOCAL_ID" format-numeric ng-disabled="true">
+                </div>
+            </div>
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    Name :
+                </div>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.NAME">
+                </div>
+            </div>
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    Price :
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.PRICE" format-numeric >
+                </div>
+            </div>
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    Deposit rate :
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.DEPOSIT_FEE_RATE" format-numeric>
+                </div>
+                <div class="col-md-2">
+                    %
+                </div>
+            </div>
+        </div>
         <div class="theme col-sm-8" style="margin-left:20px;border-left:solid;border-width:thin;border-color:#A0A0A0;overflow:auto;">
-            <!--<img ng-src="{{formData.Event.PLAN_PATH}}" style="position: absolute;max-height:100%" />-->
-            <!--<div style="width:100%;height:100%;background-image:url('{{formData.Event.PLAN_PATH}}');background-size: contain, cover;background-repeat: no-repeat;">-->
-            <img ng-src="{{formData.Event.PLAN_PATH}}" style="position: absolute;" />
+            <img id="PlanImage" ng-src="{{formData.Event.PLAN_PATH}}" style="position: absolute;" />
             <table id="PlanGrid" border="1" class="theme-table" style="position: relative;table-layout:fixed;">
                 <tbody>
                     <tr ng-repeat="n in [].constructor(gridRow)  track by $index">
@@ -110,13 +145,13 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-3" ng-hide="planMode != 0">
             <div class="row custom-row">
                 <div class="col-md-5">
                     Plan width :
                 </div>
                 <div class="col-md-5">
-                    <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.WIDTH" ng-blur="calculateGrid()"  format-numeric>
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.WIDTH" ng-blur="calculateGrid()" format-numeric>
                 </div>
                 <div class="col-md-2">
                     m
@@ -127,7 +162,7 @@
                     Plan depth :
                 </div>
                 <div class="col-md-5">
-                    <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.DEPTH" ng-blur="calculateGrid()"  format-numeric>
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.DEPTH" ng-blur="calculateGrid()" format-numeric>
                 </div>
                 <div class="col-md-2">
                     m
@@ -153,6 +188,24 @@
                 </div>
             </div>
             <hr />
+            <div class="row custom-row">
+                <div class="col-md-12">
+                    <label class="btn btn-success btn-file" ng-click="planSubmit()">
+                        Select Food Truck Group
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2" ng-hide="planMode == 0">
+            <div class="row custom-row">
+                <div class="col-md-12">
+                    <label class="btn btn-success btn-file" ng-click="backToDrawPlan()">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        Back
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </div>

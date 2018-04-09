@@ -245,6 +245,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     Opening();
 
     function Opening() {
+        $scope.planMode = 0;
         $scope.drawMode = 0;
         $scope.ObjectType = 0;
         $scope.ObjectOrientation = 0;
@@ -262,6 +263,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.formData.Event = {};
         $scope.formData.Event.PLAN_PATH = '';
         $scope.formData.Shop = {};
+        $scope.formData.ShopList = []; 
+        $scope.SelectedShop = {};
 
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
@@ -272,7 +275,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 console.log('Unable to edit event data: ' + error.message)
             })
 
-        BaseService.CallAction(EVENT_PATH, "GetPlan", null)
+        BaseService.CallAction(EVENT_PATH, "GetPlanShop", null)
             .then(function (result) {
                 $scope.formData.Shop = result;
                 for (var i = 0; i < $scope.formData.Shop.length; i++) {
@@ -280,8 +283,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     var _ftSplit = _ftString.split("|");
                     for (var j = 0; j < _ftSplit.length; j++) {
                         $scope.ObjectPosition.push({
-                            parent: _ftSplit[j].split(",")[1],
-                            index: _ftSplit[j].split(",")[0],
+                            parent: parseInt(_ftSplit[j].split(",")[1]),
+                            index: parseInt(_ftSplit[j].split(",")[0]),
                             ObjectType: 0,
                             ObjectGroup: 0
                         });
@@ -309,24 +312,25 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     }
 
     $scope.mouseOverPosition = function ($parentIndex, $index) {
-
-        var activeClass = '';
-        if ($scope.ObjectType == 0) {
-            activeClass = 'activeFoodTruckOver';
-        } else if ($scope.ObjectType == 1) {
-            activeClass = 'activeStageOver';
-        } else if ($scope.ObjectType == 2) {
-            activeClass = 'activeWallOver';
-        }
-
-        if ($scope.drawMode == 1) {
-            for (var i = 0; i < $scope.ObjectDepth; i++) {
-                for (var j = 0; j < $scope.ObjectWidth; j++) {
-                    document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.add(activeClass);
-                }
+        if ($scope.planMode == 0) {
+            var activeClass = '';
+            if ($scope.ObjectType == 0) {
+                activeClass = 'activeFoodTruckOver';
+            } else if ($scope.ObjectType == 1) {
+                activeClass = 'activeStageOver';
+            } else if ($scope.ObjectType == 2) {
+                activeClass = 'activeWallOver';
             }
-        } else {
-            document.getElementById($parentIndex + "," + $index).classList.add(activeClass);
+
+            if ($scope.drawMode == 1) {
+                for (var i = 0; i < $scope.ObjectDepth; i++) {
+                    for (var j = 0; j < $scope.ObjectWidth; j++) {
+                        document.getElementById(parseInt($parentIndex + i) + "," + parseInt($index + j)).classList.add(activeClass);
+                    }
+                }
+            } else {
+                document.getElementById($parentIndex + "," + $index).classList.add(activeClass);
+            }
         }
     }
 
@@ -353,43 +357,57 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     }
 
     $scope.selectPosition = function ($parentIndex, $index) {
-        if ($scope.drawMode == 0) {
-            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
-                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
-                    $scope.ObjectPosition.splice(i, 1);
-                    break;
+        if ($scope.planMode == 0) {
+            if ($scope.drawMode == 0) {
+                for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                    if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                        $scope.ObjectPosition.splice(i, 1);
+                        break;
+                    }
+                }
+
+                $scope.ObjectPosition.push({
+                    parent: $parentIndex,
+                    index: $index,
+                    ObjectType: $scope.ObjectType,
+                    ObjectGroup: 0
+                });
+            } else if ($scope.drawMode == 1) {
+                for (var i = 0; i < $scope.ObjectDepth; i++) {
+                    for (var j = 0; j < $scope.ObjectWidth; j++) {
+                        for (var k = 0; k < $scope.ObjectPosition.length; k++) {
+                            if ($scope.ObjectPosition[k].index == parseInt($index + j) && $scope.ObjectPosition[k].parent == parseInt($parentIndex + i)) {
+                                $scope.ObjectPosition.splice(k, 1);
+                                break;
+                            }
+                        }
+
+                        $scope.ObjectPosition.push({
+                            parent: parseInt($parentIndex + i),
+                            index: parseInt($index + j),
+                            ObjectType: $scope.ObjectType,
+                            ObjectGroup: 0
+                        });
+                    }
+                }
+            } else {
+                for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                    if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                        $scope.ObjectPosition.splice(i, 1);
+                        return;
+                    }
                 }
             }
-
-            $scope.ObjectPosition.push({
-                parent: $parentIndex,
-                index: $index,
-                ObjectType: $scope.ObjectType,
-                ObjectGroup: 0
-            });
-        } else if ($scope.drawMode == 1) {
-            for (var i = 0; i < $scope.ObjectDepth; i++) {
-               for (var j = 0; j < $scope.ObjectWidth; j++) {
-                    for (var k = 0; k < $scope.ObjectPosition.length; k++) {
-                        if ($scope.ObjectPosition[k].index == parseInt($index + j) && $scope.ObjectPosition[k].parent == parseInt($parentIndex + i)) {
-                            $scope.ObjectPosition.splice(k, 1);
+        } else if ($scope.planMode == 1) {
+            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                    for (var j = 0; j < $scope.formData.ShopList.length; j++) {
+                        if ($scope.formData.ShopList[j].LOCAL_ID == $scope.ObjectPosition[i].ObjectGroup) {
+                            $scope.SelectedShop = $scope.formData.ShopList[j];
                             break;
                         }
                     }
-
-                    $scope.ObjectPosition.push({
-                        parent: parseInt($parentIndex + i),
-                        index: parseInt($index + j),
-                        ObjectType: $scope.ObjectType,
-                        ObjectGroup: 0
-                    });
-                }
-            }
-        } else {
-            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
-                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
-                    $scope.ObjectPosition.splice(i, 1);
-                    return;
+                    break;
                 }
             }
         }
@@ -504,7 +522,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         BaseService.CallAction(EVENT_PATH, "SubmitPlan", data)
             .then(function (result) {
                 $scope.formData.Event = result[0];
-                BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+                //BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
 
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
@@ -544,6 +562,31 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         }
         if (error)
             BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลจุดจอดได้');
+
+        //to create group
+        for (var i = 1; i <= FoodTruckNumber; i++) {
+            var _ft = $filter('filter')($scope.ObjectPosition, { 'ObjectGroup': i }, true)
+            var _ftString = ''
+            if (_ft.length > 0) {
+                for (var j = 0; j < _ft.length; j++) {
+                    _ftString += _ft[j].index + ',' + _ft[j].parent + '|';
+                }
+            }
+            _ftString = _ftString.substring(0, _ftString.length - 1);
+
+            $scope.formData.ShopList.push({
+                LOCAL_ID: i,
+                EVENT_ID: $scope.formData.Event.EVENT_ID,
+                NAME: '',
+                PRICE: '',
+                DEPOSIT: '',
+                FT: _ftString
+            });
+        }
+
+        $scope.planMode = 1;
+        document.getElementById("PlanGrid").style.border = "none #FFFFFF";
+        document.getElementById("PlanImage").style.display = "none";
     }
 
     function groupingObject() {
@@ -652,5 +695,41 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }
         }
         return FoodTruckNumber;
+    }
+
+    $scope.backToDrawPlan = function () {
+        $scope.planMode = 0;
+        document.getElementById("PlanGrid").style.border = "solid thin #000000";
+        document.getElementById("PlanImage").style.display = "initial";
+
+        BaseService.CallAction(EVENT_PATH, "GetEvent", null)
+            .then(function (result) {
+                $scope.formData.Event = result[0];
+                $scope.calculateGrid();
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
+
+        BaseService.CallAction(EVENT_PATH, "GetPlanShop", null)
+            .then(function (result) {
+                $scope.formData.Shop = result;
+                for (var i = 0; i < $scope.formData.Shop.length; i++) {
+                    var _ftString = $scope.formData.Shop[i].SHOP_POSITION;
+                    var _ftSplit = _ftString.split("|");
+                    for (var j = 0; j < _ftSplit.length; j++) {
+                        $scope.ObjectPosition.push({
+                            parent: parseInt(_ftSplit[j].split(",")[1]),
+                            index: parseInt(_ftSplit[j].split(",")[0]),
+                            ObjectType: 0,
+                            ObjectGroup: 0
+                        });
+                    }
+                }
+
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
     }
 })

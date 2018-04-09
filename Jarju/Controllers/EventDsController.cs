@@ -74,17 +74,16 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetPlan()
+        public JsonResult GetPlanShop()
         {
             DataTable dt = new DataTable();
 
             if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
             {
-                gSQL = "EXEC [sp_Plan] {0}";
+                gSQL = "EXEC [sp_Plan_Shop] {0}";
                 gSQL = String.Format(gSQL,
                              Session[Cons.SS_EVENT_ID].ToString());
                 dt = odb.SqlQuery(gSQL, mDBName);
-                Session[Cons.SS_EVENT_ID] = null;
             }
 
 
