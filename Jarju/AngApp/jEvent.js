@@ -557,15 +557,34 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }
             _ftString = _ftString.substring(0, _ftString.length - 1);
 
-            $scope.formData.Shop = {
-                LOCAL_ID: i,
-                EVENT_ID: $scope.formData.Event.EVENT_ID,
-                NAME: '',
-                PRICE: '',
-                DEPOSIT_FEE_RATE: '',
-                FT: _ftString,
-                BLOCK_ID: 0
-            };
+            if ($scope.formData.ShopList.length > 0) {
+                var _shop = $filter('filter')($scope.formData.ShopList, { 'LOCAL_ID': i }, true);
+                if (_shop.length > 0) {
+                    $scope.formData.Shop = _shop[0];
+                } else {
+                    $scope.formData.Shop = {
+                        LOCAL_ID: i,
+                        EVENT_ID: $scope.formData.Event.EVENT_ID,
+                        NAME: '',
+                        PRICE: '',
+                        DEPOSIT_FEE_RATE: '',
+                        FT: _ftString,
+                        BLOCK_ID: 0
+                    };
+                }
+            } else {
+                $scope.formData.Shop = {
+                    LOCAL_ID: i,
+                    EVENT_ID: $scope.formData.Event.EVENT_ID,
+                    NAME: '',
+                    PRICE: '',
+                    DEPOSIT_FEE_RATE: '',
+                    FT: _ftString,
+                    BLOCK_ID: 0
+                };
+            }
+
+            
             scopeData = $scope.formData.Shop;
             data = $.param(scopeData);
             BaseService.CallAction(EVENT_PATH, "SubmitPlanShop", data)
@@ -702,20 +721,38 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }
             _ftString = _ftString.substring(0, _ftString.length - 1);
 
-            $scope.formData.ShopList.push({
-                LOCAL_ID: i,
-                EVENT_ID: $scope.formData.Event.EVENT_ID,
-                NAME: '',
-                PRICE: '',
-                DEPOSIT_FEE_RATE: '',
-                FT: _ftString,
-                BLOCK_ID: 0
-            });
+            if ($scope.formData.ShopList.length > 0) {
+                var _shop = $filter('filter')($scope.formData.ShopList, { 'LOCAL_ID': i }, true);
+                if (_shop.length > 0) {
+                    continue;
+                } else {
+                    $scope.formData.ShopList.push({
+                        LOCAL_ID: i,
+                        EVENT_ID: $scope.formData.Event.EVENT_ID,
+                        NAME: '',
+                        PRICE: '',
+                        DEPOSIT_FEE_RATE: '',
+                        FT: _ftString,
+                        BLOCK_ID: 0
+                    });
+                }
+            } else {
+                $scope.formData.ShopList.push({
+                    LOCAL_ID: i,
+                    EVENT_ID: $scope.formData.Event.EVENT_ID,
+                    NAME: '',
+                    PRICE: '',
+                    DEPOSIT_FEE_RATE: '',
+                    FT: _ftString,
+                    BLOCK_ID: 0
+                });
+            }
         }
 
         $scope.planMode = 1;
         document.getElementById("PlanGrid").style.border = "none";
         document.getElementById("PlanImage").style.display = "none";
+        console.log($scope.formData.ShopList);
     }
 
     $scope.StartSelectBlock = function () {
