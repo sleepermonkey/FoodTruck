@@ -538,7 +538,6 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
         BaseService.CallAction(EVENT_PATH, "SubmitPlan", data)
             .then(function (result) {
-                $scope.formData.Event = result[0];
                 //BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
 
             }, function (error) {
@@ -563,15 +562,14 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 EVENT_ID: $scope.formData.Event.EVENT_ID,
                 NAME: '',
                 PRICE: '',
-                DEPOSIT: '',
-                FT: _ftString
+                DEPOSIT_FEE_RATE: '',
+                FT: _ftString,
+                BLOCK_ID: 0
             };
             scopeData = $scope.formData.Shop;
             data = $.param(scopeData);
             BaseService.CallAction(EVENT_PATH, "SubmitPlanShop", data)
                 .then(function (result) {
-                    $scope.formData.Event = result[0];
-
                 }, function (error) {
                     error = true;
                     console.log('Unable to edit plan shop data: ' + error.message)
@@ -580,31 +578,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         if (error)
             BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลจุดจอดได้');
 
-        //to create group
-        for (var i = 1; i <= FoodTruckNumber; i++) {
-            var _ft = $filter('filter')($scope.ObjectPosition, { 'ObjectGroup': i }, true)
-            var _ftString = ''
-            if (_ft.length > 0) {
-                for (var j = 0; j < _ft.length; j++) {
-                    _ftString += _ft[j].index + ',' + _ft[j].parent + '|';
-                }
-            }
-            _ftString = _ftString.substring(0, _ftString.length - 1);
-
-            $scope.formData.ShopList.push({
-                LOCAL_ID: i,
-                EVENT_ID: $scope.formData.Event.EVENT_ID,
-                NAME: '',
-                PRICE: '',
-                DEPOSIT: '',
-                FT: _ftString,
-                BLOCK_ID: 0
-            });
-        }
-
-        $scope.planMode = 1;
-        document.getElementById("PlanGrid").style.border = "none";
-        document.getElementById("PlanImage").style.display = "none";
+        return FoodTruckNumber;
     }
 
     function groupingObject() {
@@ -713,6 +687,35 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }
         }
         return FoodTruckNumber;
+    }
+
+    $scope.selectBlock = function () {
+        var FoodTruckNumber = $scope.planSubmit();
+
+        for (var i = 1; i <= FoodTruckNumber; i++) {
+            var _ft = $filter('filter')($scope.ObjectPosition, { 'ObjectGroup': i }, true)
+            var _ftString = ''
+            if (_ft.length > 0) {
+                for (var j = 0; j < _ft.length; j++) {
+                    _ftString += _ft[j].index + ',' + _ft[j].parent + '|';
+                }
+            }
+            _ftString = _ftString.substring(0, _ftString.length - 1);
+
+            $scope.formData.ShopList.push({
+                LOCAL_ID: i,
+                EVENT_ID: $scope.formData.Event.EVENT_ID,
+                NAME: '',
+                PRICE: '',
+                DEPOSIT_FEE_RATE: '',
+                FT: _ftString,
+                BLOCK_ID: 0
+            });
+        }
+
+        $scope.planMode = 1;
+        document.getElementById("PlanGrid").style.border = "none";
+        document.getElementById("PlanImage").style.display = "none";
     }
 
     $scope.StartSelectBlock = function () {
@@ -856,5 +859,19 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
             })
+    }
+
+    $scope.planBlockSubmit = function () {
+        for (var i = 0; i < $scope.formData.ShopList.length; i++) {
+            scopeData = $scope.formData.ShopList[i];
+            data = $.param(scopeData);
+            BaseService.CallAction(EVENT_PATH, "SubmitPlanShop", data)
+                .then(function (result) {
+                }, function (error) {
+                    error = true;
+                    console.log('Unable to edit plan shop data: ' + error.message)
+                })
+        }
+        
     }
 })

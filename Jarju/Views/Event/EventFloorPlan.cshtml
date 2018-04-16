@@ -18,7 +18,7 @@
             </label>
             Plan File : {{fileUpload.name}}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label class="btn btn-success btn-file" ng-click="uploadPlanImage()">
                 <span class="glyphicon glyphicon-upload"></span>&nbsp;
                 Upload
@@ -28,25 +28,39 @@
                 Save Plan
             </label>
         </div>
+        <div class="col-md-3" align="right">
+            <label class="btn btn-success btn-file" ng-click="selectBlock()">
+                Select Food Truck Group
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </label>
+        </div>
     </div>
     <div class="row custom-row" style="font-size:10pt;border-bottom:solid;border-width:thin;border-color:#F0F0F0;" ng-hide="planMode != 1">
         <div class="col-md-3">
+            <label class="btn btn-success btn-file" ng-click="backToDrawPlan()">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Back
+            </label>
         </div>
         <div class="col-md-3">
             <label class="btn btn-success btn-file" ng-click="StartSelectBlock()">
                 <span class="glyphicon glyphicon-pushpin"></span>&nbsp;
-                Start Block
+                Start Block :
             </label>
-            : {{StartBlock}}
+            <input class="form-control" value="{{StartBlock}}" ng-disabled="true" style="width:75px;"/>
         </div>
         <div class="col-md-3">
             <label class="btn btn-success btn-file" ng-click="EndSelectBlock()">
                 <span class="glyphicon glyphicon-pushpin"></span>&nbsp;
-                End Block
+                End Block :
             </label>
-            : {{EndBlock}}
+            <input class="form-control" value="{{EndBlock}}" ng-disabled="true" style="width:75px;" />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3" align="right">
+            <label class="btn btn-success btn-file" ng-click="planBlockSubmit()">
+                <span class="glyphicon glyphicon-save-file"></span>&nbsp;
+                Save
+            </label>
         </div>
     </div>
     <div class="row custom-row" style="font-size:10pt">
@@ -219,21 +233,13 @@
             </div>
             <hr />
             <div class="row custom-row">
-                <div class="col-md-12">
-                    <label class="btn btn-success btn-file" ng-click="planSubmit()">
-                        Select Food Truck Group
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </label>
-                </div>
+                
             </div>
         </div>
         <div class="col-sm-2" ng-hide="planMode == 0">
             <div class="row custom-row">
                 <div class="col-md-12">
-                    <label class="btn btn-success btn-file" ng-click="backToDrawPlan()">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
-                        Back
-                    </label>
+                    
                 </div>
             </div>
         </div>
