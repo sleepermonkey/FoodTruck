@@ -290,7 +290,6 @@ app.directive('draggable', function () {
             'dragstart',
             function (e) {
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('Text', this.id);
                 this.classList.add('drag');
                 return false;
             },

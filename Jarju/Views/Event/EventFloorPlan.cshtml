@@ -23,10 +23,30 @@
                 <span class="glyphicon glyphicon-upload"></span>&nbsp;
                 Upload
             </label>
-            <!--<label class="btn btn-success btn-file" ng-click="planSubmit()">
+            <label class="btn btn-success btn-file" ng-click="planSubmit()">
                 <span class="glyphicon glyphicon-save-file"></span>&nbsp;
                 Save Plan
-            </label>-->
+            </label>
+        </div>
+    </div>
+    <div class="row custom-row" style="font-size:10pt;border-bottom:solid;border-width:thin;border-color:#F0F0F0;" ng-hide="planMode != 1">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-3">
+            <label class="btn btn-success btn-file" ng-click="StartSelectBlock()">
+                <span class="glyphicon glyphicon-pushpin"></span>&nbsp;
+                Start Block
+            </label>
+            : {{StartBlock}}
+        </div>
+        <div class="col-md-3">
+            <label class="btn btn-success btn-file" ng-click="EndSelectBlock()">
+                <span class="glyphicon glyphicon-pushpin"></span>&nbsp;
+                End Block
+            </label>
+            : {{EndBlock}}
+        </div>
+        <div class="col-md-4">
         </div>
     </div>
     <div class="row custom-row" style="font-size:10pt">
@@ -111,7 +131,7 @@
                     Price :
                 </div>
                 <div class="col-md-5">
-                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.PRICE" format-numeric >
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.PRICE" format-numeric>
                 </div>
             </div>
             <div class="row custom-row">
@@ -125,8 +145,17 @@
                     %
                 </div>
             </div>
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    Block :
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.BLOCK_ID" format-numeric>
+                </div>
+            </div>
         </div>
         <div class="theme col-sm-8" style="margin-left:20px;border-left:solid;border-width:thin;border-color:#A0A0A0;overflow:auto;">
+            <drawing width="500" height="300" rectangle-list='rectangles' style="position: absolute;z-index:1;"></drawing>
             <img id="PlanImage" ng-src="{{formData.Event.PLAN_PATH}}" style="position: absolute;" />
             <table id="PlanGrid" border="1" class="theme-table" style="position: relative;table-layout:fixed;">
                 <tbody>
@@ -144,6 +173,7 @@
                     </tr>
                 </tbody>
             </table>
+
         </div>
         <div class="col-sm-3" ng-hide="planMode != 0">
             <div class="row custom-row">

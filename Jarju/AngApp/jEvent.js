@@ -258,6 +258,11 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.ObjectPosition = [];
         $scope.ObjectGroup = [];
         $scope.fileUpload = null;
+        $scope.StartBlock = null;
+        $scope.EndBlock = null;
+        $scope.StartBlockState = false;
+        $scope.EndBlockState = false;
+        $scope.CurrentInsertBlock = 0;
 
         $scope.formData = {};
         $scope.formData.Event = {};
@@ -407,32 +412,44 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                             break;
                         }
                     }
+                    $scope.StartBlockState = false;
+                    $scope.EndBlockState = false;
                     break;
                 }
+            }
+
+            if ($scope.StartBlockState) {
+                $scope.StartBlock = $parentIndex + ',' + $index;
+                createBlock();
+            } else if ($scope.EndBlockState) {
+                $scope.EndBlock = $parentIndex + ',' + $index;
+                createBlock();
             }
         }
     }
 
     $scope.dragOverPosition = function ($parentIndex, $index) {
-        if ($scope.drawMode == 0) {
-            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
-                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
-                    return;
+        if ($scope.planMode == 0) {
+            if ($scope.drawMode == 0) {
+                for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                    if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                        return;
+                    }
                 }
-            }
 
-            $scope.ObjectPosition.push({
-                parent: $parentIndex,
-                index: $index,
-                ObjectType: $scope.ObjectType,
-                ObjectGroup: 0
-            });
-            
-        } else if ($scope.drawMode == 2) {
-            for (var i = 0; i < $scope.ObjectPosition.length; i++) {
-                if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
-                    $scope.ObjectPosition.splice(i, 1);
-                    return;
+                $scope.ObjectPosition.push({
+                    parent: $parentIndex,
+                    index: $index,
+                    ObjectType: $scope.ObjectType,
+                    ObjectGroup: 0
+                });
+
+            } else if ($scope.drawMode == 2) {
+                for (var i = 0; i < $scope.ObjectPosition.length; i++) {
+                    if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
+                        $scope.ObjectPosition.splice(i, 1);
+                        return;
+                    }
                 }
             }
         }
@@ -495,12 +512,12 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
         var gridSize = 0;
         if ($scope.formData.Event.GRID_SIZE == 0) {
-            $scope.gridWidth = '5px';
-            $scope.gridHeight = '5px';
+            $scope.gridWidth = '2px';
+            $scope.gridHeight = '2px';
             gridSize = 0.5;
         } else {
-            $scope.gridWidth = '10px';
-            $scope.gridHeight = '10px';
+            $scope.gridWidth = '5px';
+            $scope.gridHeight = '5px';
             gridSize = 1;
         }
 
@@ -580,18 +597,19 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 NAME: '',
                 PRICE: '',
                 DEPOSIT: '',
-                FT: _ftString
+                FT: _ftString,
+                BLOCK_ID: 0
             });
         }
 
         $scope.planMode = 1;
-        document.getElementById("PlanGrid").style.border = "none #FFFFFF";
+        document.getElementById("PlanGrid").style.border = "none";
         document.getElementById("PlanImage").style.display = "none";
     }
 
     function groupingObject() {
         angular.forEach($scope.ObjectPosition, function (item) { item.ObjectGroup = 0; });
-        var itemsSorted = $filter('orderBy')($scope.ObjectPosition, ['index','parent'])
+        var itemsSorted = $filter('orderBy')($scope.ObjectPosition, ['index', 'parent']);
         var FoodTruckNumber = 0;
         for (var i = 0; i < itemsSorted.length; i++) {
             var _ft = itemsSorted[i];
@@ -697,10 +715,116 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         return FoodTruckNumber;
     }
 
+    $scope.StartSelectBlock = function () {
+        $scope.StartBlockState = true;
+        $scope.EndBlockState = false;
+    }
+
+    $scope.EndSelectBlock = function() {
+        $scope.EndBlockState = true;
+        $scope.StartBlockState = false;
+    }
+
+    function createBlock() {
+        if ($scope.StartBlock != null && $scope.EndBlock != null) {
+
+            for (var i = 0; i < $scope.gridRow; i++) {
+                for (var j = 0; j < $scope.gridColumn; j++) {
+                    document.getElementById(i + "," + j).classList.remove('activeFoodTruckGroup');
+                }
+            }
+
+            var _sy = parseInt($scope.StartBlock.split(',')[0]);
+            var _ey = parseInt($scope.EndBlock.split(',')[0]);
+            var _sx = parseInt($scope.StartBlock.split(',')[1]);
+            var _ex = parseInt($scope.EndBlock.split(',')[1]);
+
+            if (_sy > _ey) {
+                _sy = parseInt($scope.EndBlock.split(',')[0]);
+                _ey = parseInt($scope.StartBlock.split(',')[0]);
+            }
+
+            if (_sx > _ex) {
+                _sx = parseInt($scope.EndBlock.split(',')[1]);
+                _ex = parseInt($scope.StartBlock.split(',')[1]);
+            }
+
+            for (var i = _sx; i <= _ex; i++) {
+                document.getElementById(_sy + "," + parseInt(i)).classList.add('activeFoodTruckGroup');
+            }
+
+            for (var i = _sy; i <= _ey; i++) {
+                document.getElementById(parseInt(i)  + "," + _sx).classList.add('activeFoodTruckGroup');
+            }
+
+            for (var i = _sx; i <= _ex; i++) {
+                document.getElementById(_ey + "," + parseInt(i)).classList.add('activeFoodTruckGroup');
+            }
+
+            for (var i = _sy; i <= _ey; i++) {
+                document.getElementById(parseInt(i) + "," + _ex).classList.add('activeFoodTruckGroup');
+            }
+            
+            BaseService.Message.input('Please insert group number')
+                .then(function (result) {
+                    $scope.CurrentInsertGroup = result;
+                });
+        }
+    }
+
+    $scope.$watch('CurrentInsertGroup', function (newVal, oldVal) {
+        if (newVal != 0 && newVal != null) {
+            $scope.CurrentInsertBlock = 0;
+            setBlockNumber(newVal);
+        }
+    });
+
+    function setBlockNumber(_num) {
+
+        var _sy = parseInt($scope.StartBlock.split(',')[0]);
+        var _ey = parseInt($scope.EndBlock.split(',')[0]);
+        var _sx = parseInt($scope.StartBlock.split(',')[1]);
+        var _ex = parseInt($scope.EndBlock.split(',')[1]);
+
+        if (_sy > _ey) {
+            _sy = parseInt($scope.EndBlock.split(',')[0]);
+            _ey = parseInt($scope.StartBlock.split(',')[0]);
+        }
+
+        if (_sx > _ex) {
+            _sx = parseInt($scope.EndBlock.split(',')[1]);
+            _ex = parseInt($scope.StartBlock.split(',')[1]);
+        }
+
+        var itemsSorted = $filter('orderBy')($scope.ObjectPosition, ['index', 'parent']);
+        for (var x = _sx; x <= _ex; x++) {
+            for (var y = _sy; y <= _ey; y++) {
+                var _ft = $filter('filter')(itemsSorted, { 'index': x, 'parent': y }, true)
+                if (_ft.length > 0) {
+                    for (var j = 0; j < $scope.formData.ShopList.length; j++) {
+                        if ($scope.formData.ShopList[j].LOCAL_ID == _ft[0].ObjectGroup) {
+                            $scope.formData.ShopList[j].BLOCK_ID = _num;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        $scope.StartGroup = null;
+        $scope.EndGroup = null;
+    }
+
     $scope.backToDrawPlan = function () {
         $scope.planMode = 0;
         document.getElementById("PlanGrid").style.border = "solid thin #000000";
         document.getElementById("PlanImage").style.display = "initial";
+
+        for (var i = 0; i < $scope.gridRow; i++) {
+            for (var j = 0; j < $scope.gridColumn; j++) {
+                document.getElementById(i + "," + j).classList.remove('activeFoodTruckGroup');
+            }
+        }
 
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
@@ -711,6 +835,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 console.log('Unable to edit event data: ' + error.message)
             })
 
+        $scope.ObjectPosition = [];
         BaseService.CallAction(EVENT_PATH, "GetPlanShop", null)
             .then(function (result) {
                 $scope.formData.Shop = result;

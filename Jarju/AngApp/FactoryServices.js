@@ -192,6 +192,32 @@
                 }
 
                 return $uibModal.open(tempModalDefaults).result;
+            },
+            input: function (customText) {
+                var tempModalDefaults = {
+                    backdrop: true,
+                    keyboard: true,
+                    modalFade: true,
+                    templateUrl: 'input-modal'
+                };
+                var tempModalOptions = {
+                    bodyText: customText,
+                    inputData: ''
+                };
+
+                if (!tempModalDefaults.controller) {
+                    tempModalDefaults.controller = function ($scope, $uibModalInstance) {
+                        $scope.modalOptions = tempModalOptions;
+                        $scope.modalOptions.ok = function (result) {
+                            $uibModalInstance.close($scope.modalOptions.inputData);
+                        };
+                        $scope.modalOptions.close = function (result) {
+                            $uibModalInstance.dismiss();
+                        };
+                    };
+                }
+
+                return $uibModal.open(tempModalDefaults).result;
             }
         }
 

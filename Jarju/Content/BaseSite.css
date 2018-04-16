@@ -1103,6 +1103,11 @@ a.pointer-link {
     background-color: lightsalmon;
 }
 
+.activeFoodTruckGroup {
+    background-color: black;
+}
+
+
 .inactive {
     background-color: none;
 }
