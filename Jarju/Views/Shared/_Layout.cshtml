@@ -35,7 +35,8 @@
                                 <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
                                 <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
                             </div>
-                        } else
+                        }
+                        else
                         {
                             <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
                                 <a href="@Url.Action("Login", "Home")" style="font-size:9pt">[LOG IN]</a> |
@@ -44,8 +45,8 @@
                         }
                     </div>
                 </div>
-            </div>       
-        </div> 
+            </div>
+        </div>
         <div class="row" style="margin-top:0px;background-color:#4CAF50">
             <div class="dropdown">
                 <button class="dropbtn">
@@ -61,19 +62,17 @@
                     Food Truck
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">Link 1</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
+                    <a href="@Url.Action("FoodtruckProfile", "Foodtruck")" style="font-size:9pt">Profile</a>
                 </div>
             </div>
             <div class="dropdown">
                 <button class="dropbtn">
-                    Dropdown
+                    Menu
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">Link 1</a>
-                    <a href="#">Link 2</a>
-                    <a href="#">Link 3</a>
+                    <a href="@Url.Action("MenuStyle", "Menu")" style="font-size:9pt">Menu Style</a>
+                    <a href="@Url.Action("MenuType", "Menu")" style="font-size:9pt">Menu Type</a>
+                    <a href="#">Menu</a>
                 </div>
             </div>
         </div>
@@ -206,8 +205,10 @@
     <script src="~/AngApp/jConfiguration.js"></script>
     <script src="~/AngApp/jOperation.js"></script>
     <script src="~/AngApp/jEvent.js"></script>
+    <script src="~/AngApp/jFoodtruck.js"></script>
+    <script src="~/AngApp/jMenu.js"></script>
     <script src="https://cdn.rawgit.com/bradberger/angular-material-calendar/master/dist/angular-material-calendar.js"></script>
-    
+
     <link href="~/bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css" rel="stylesheet">
     <script src="~/bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.js"></script>
 

@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewBag.Title = "Customer information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="FoodTruckProfileController" style="width:100%">
+    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+        <div class="row hdBar">
+            <div class="col-sm-9"><h4>Food Truck Profile</h4></div>
+            <div class="col-sm-3" style="margin-top:6px;text-align:right;">
+                <button type="button" class="btn btn-primary" ng-click="Edit_Submit()">
+                    <span class="glyphicon glyphicon-floppy-save"></span> Save
+                </button>
+            </div>
+        </div>
+        <div id="EditItem" class="row">
+            <div id="CustomerInfo" class="col-sm-4">
+                <div class="row custom-row">
+                    <div class="col-md-5">
+                        Code:
+                    </div>
+                    <div class="col-md-3">
+                        {{formData.foodtruck.SHOP_ID}}
+                    </div>
+                </div>
+
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Name:
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.foodtruck.SHOP_NAME">
+                    </div>
+                </div>
+                <br>
+                <div class="row custom-row">
+                    <div class="col-md-3"></div>
+
+                </div>
+            </div>
+            <div class="col-sm-5" style="margin-top:10px;">
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center">
+                                Menu
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in ListEmail">
+                            <td class="tblDetail">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="foodmenuname" ng-model="row.EMAIL">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger" ng-click="DeleteEmail_Click(row)">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="sm-table-row"></tr>
+                        <tr class="sm-table-row">
+                            <td class="tblDetail">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="foodmenuname" ng-model="ADDEMAIL">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-success" ng-click="AddEmail_Click()">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3" style="margin-top:10px;">
+                <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center">
+                                Dislike
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in ListTel">
+                            <td class="tblDetail">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="foodmenuname" ng-model="row.TEL" maxlength="10" format-numeric>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger" ng-click="DeleteTel_Click(row)">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="sm-table-row"></tr>
+                        <tr class="sm-table-row">
+                            <td class="tblDetail">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="foodmenuname" ng-model="ADDTEL" maxlength="10" format-numeric>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-success" ng-click="AddTel_Click()">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="height:20px"></div>
+</div>
