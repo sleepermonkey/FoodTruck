@@ -1361,6 +1361,7 @@
     <Content Include="Views\Foodtruck\FoodtruckProfile.cshtml" />
     <Content Include="Views\Menu\MenuType.cshtml" />
     <Content Include="Views\Menu\MenuStyle.cshtml" />
+    <Content Include="Views\Menu\Menu.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

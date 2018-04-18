@@ -27,5 +27,12 @@ namespace Jarju.Controllers
 
             return View();
         }
+
+        public ActionResult Menu()
+        {
+            ViewBag.PageTitle = "Menu";
+
+            return View();
+        }
     }
 }

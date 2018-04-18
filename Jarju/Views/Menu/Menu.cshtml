@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="MenuStyleController" style="width:100%">
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="MenuController" style="width:100%">
     <div class="row custom-row">
         <div class="col-md-1">
             <label>
@@ -12,10 +12,10 @@
             </label>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="TYPE_NAME" ng-model="FILTER.STYLE_NAME" placeholder="Style Name">
+            <input type="text" class="form-control" name="MENU_NAME" ng-model="FILTER.MENU_NAME" placeholder="Menu Name">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="TYPE_NAME" ng-model="FILTER.TYPE_NAME" placeholder="Type">
+            <input type="text" class="form-control" name="STYLE_NAME" ng-model="FILTER.STYLE_NAME" placeholder="Style">
         </div>
         <div class="col-md-7" style="text-align:right">
             <button type="button" class="btn btn-success" ng-click="ShowItem_Click(0)">
@@ -44,14 +44,14 @@
                 <tbody>
                     <tr class="sm-table-row"
                         ng-repeat="row in ListDetail | orderBy:sortType:sortReverse
-                            | filter:{NAME : FILTER.STYLE_NAME}
-                            | filter:{ITEM_TYPE_NAME : FILTER.TYPE_NAME}">
+                            | filter:{NAME : FILTER.MENU_NAME}
+                            | filter:{ITEM_STYLE_NAME : FILTER.STYLE_NAME}">
                         <td class="tblDetail"
                             ng-repeat="Field in ListHeader"
                             ng-show="Field.VISIBILITY==1"
                             width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
                             <div ng-if="Field.FIELD_NAME == 'EDIT'">
-                                <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.ITEM_STYLE_ID)">
+                                <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.ITEM_MENU_ID)">
                                 </a>
                             </div>
                             <div ng-if="Field.FIELD_NAME != 'EDIT'">
@@ -71,7 +71,7 @@
         </header>
         <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
             <div class="col-sm-12 hdBar">
-                <h4>Edit Menu Type</h4>
+                <h4>Edit Menu</h4>
             </div>
             <div id="EditItem" class="row">
                 <form name="dealerConf">
@@ -79,29 +79,29 @@
                     <div class="row custom-row">
                         <div class="col-md-1"></div>
                         <div class="col-md-2">
-                            Menu Style code:
+                            Menu code:
                         </div>
                         <div class="col-md-3">
-                            {{formData.MenuStyle.ITEM_STYLE_ID}}
+                            {{formData.Menu.ITEM_MENU_ID}}
                         </div>
                     </div>
                     <div class="row custom-row">
                         <div class="col-md-1"></div>
                         <div class="col-md-2">
-                            Menu Style name:
+                            Menu name:
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control" name="menutypename" ng-model="formData.MenuStyle.NAME">
+                            <input type="text" class="form-control" name="menutypename" ng-model="formData.Menu.NAME">
                         </div>
                     </div>
                     <div class="row custom-row">
                         <div class="col-md-1"></div>
                         <div class="col-md-2">
-                            Menu type :
+                            Menu Style :
                         </div>
                         <div class="col-md-3">
-                            <select ng-model="formData.MenuStyle.ITEM_TYPE_ID" class="form-control" convert-to-number>
-                                <option ng-repeat="type in MenuType" value="{{type.ITEM_TYPE_ID}}">{{type.NAME}}</option>
+                            <select ng-model="formData.Menu.ITEM_STYLE_ID" class="form-control" convert-to-number>
+                                <option ng-repeat="type in MenuStyle" value="{{type.ITEM_STYLE_ID}}">{{type.NAME}}</option>
                             </select>
                         </div>
                     </div>
