@@ -9,7 +9,7 @@
         <div class="row hdBar">
             <div class="col-sm-9"><h4>Food Truck Profile</h4></div>
             <div class="col-sm-3" style="margin-top:6px;text-align:right;">
-                <button type="button" class="btn btn-primary" ng-click="Edit_Submit()">
+                <button type="button" class="btn btn-primary" ng-click="ProfileSubmit()">
                     <span class="glyphicon glyphicon-floppy-save"></span> Save
                 </button>
             </div>
@@ -45,34 +45,85 @@
                         <tr class="sm-table-header">
                             <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
                                 valign="top" align="center">
-                                Menu
+                                Dislike Menu
+                            </th>
+                            <th colspan="2" valign="top" align="right" style="background-color:white;color:black;">
+                                <div align="right">
+                                    <button type="button" class="btn btn-success" ng-click="BacktoDislikeMenuStyle()" 
+                                            ng-show="DislikeMode == 1" style="margin:2px;">
+                                        <span class="glyphicon glyphicon-arrow-left"></span>
+                                    </button>
+                                    Filter :
+                                    <input type="text" class="form-control" name="STYLE_NAME"
+                                           ng-model="FILTER.STYLE_NAME" placeholder="Style" style="width:100px;margin:2px;">
+                                    <input type="text" class="form-control" name="STYLE_NAME"
+                                           ng-model="FILTER.TYPE_NAME" placeholder="Type" style="width:100px;margin:2px;">
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="sm-table-header" ng-show="DislikeMode == 0">
+                            <th class="tblHeader"
+                                ng-repeat="Field in DislikeMenuStyleHeader"
+                                ng-show="Field.VISIBILITY==1" ng-style="setRadiusCol(Field.FIELD_NAME)"
+                                valign="top" width="{{Field.WIDTH}}" align="center">
+                                <a href="javscript:void(0);"
+                                   ng-click="OrderColumn(Field.FIELD_NAME)">
+                                    {{Field.TITLE}}
+                                    <span ng-show="sortType == Field.FIELD_NAME && !sortReverse" class="fa fa-caret-down"></span>
+                                    <span ng-show="sortType == Field.FIELD_NAME && sortReverse" class="fa fa-caret-up"></span>
+                                </a>
+                            </th>
+                        </tr>
+                        <tr class="sm-table-header" ng-show="DislikeMode == 1">
+                            <th class="tblHeader"
+                                ng-repeat="Field in DislikeMenuHeader"
+                                ng-show="Field.VISIBILITY==1" ng-style="setRadiusCol(Field.FIELD_NAME)"
+                                valign="top" width="{{Field.WIDTH}}" align="center">
+                                <a href="javscript:void(0);"
+                                   ng-click="OrderColumn(Field.FIELD_NAME)">
+                                    {{Field.TITLE}}
+                                    <span ng-show="sortType == Field.FIELD_NAME && !sortReverse" class="fa fa-caret-down"></span>
+                                    <span ng-show="sortType == Field.FIELD_NAME && sortReverse" class="fa fa-caret-up"></span>
+                                </a>
                             </th>
                         </tr>
                     </thead>
                     <tbody style="height:auto;">
-                        <tr class="sm-table-row"
-                            ng-repeat="row in ListEmail">
-                            <td class="tblDetail">
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" name="foodmenuname" ng-model="row.EMAIL">
+                        <tr class="sm-table-row" ng-show="DislikeMode == 0"
+                            ng-repeat="row in DislikeMenuStyleList | orderBy:sortType:sortReverse
+                                | filter:{NAME : FILTER.STYLE_NAME}
+                                | filter:{ITEM_TYPE_NAME : FILTER.TYPE_NAME}">
+                            <td class="tblDetail"
+                                ng-repeat="Field in DislikeMenuStyleHeader"
+                                ng-show="Field.VISIBILITY==1"
+                                width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                                <div ng-if="Field.FIELD_NAME == 'EDIT'">
+                                    <input type="checkbox" class="form-control" ng-model="row.EDIT" style="width:15px;height:15px;" 
+                                           ng-click="itemStyleChecked(row)"/>
                                 </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-danger" ng-click="DeleteEmail_Click(row)">
-                                        <span class="glyphicon glyphicon-minus"></span>
+                                <div ng-if="Field.FIELD_NAME == 'NEXT'">
+                                    <button type="button" class="btn btn-success" ng-click="DislikeDetail(row.ITEM_STYLE_ID)">
+                                        <span class="glyphicon glyphicon-arrow-right"></span>
                                     </button>
+                                </div>
+                                <div ng-if="Field.FIELD_NAME != 'EDIT' && Field.FIELD_NAME != 'NEXT'">
+                                    {{ row[Field.FIELD_NAME] }}
                                 </div>
                             </td>
                         </tr>
-                        <tr class="sm-table-row"></tr>
-                        <tr class="sm-table-row">
-                            <td class="tblDetail">
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" name="foodmenuname" ng-model="ADDEMAIL">
+                        <tr class="sm-table-row" ng-show="DislikeMode == 1"
+                            ng-repeat="row in DislikeMenuList | orderBy:sortType:sortReverse
+                                | filter:{NAME : FILTER.STYLE_NAME}
+                                | filter:{ITEM_STYLE_NAME : FILTER.TYPE_NAME}">
+                            <td class="tblDetail"
+                                ng-repeat="Field in DislikeMenuHeader"
+                                ng-show="Field.VISIBILITY==1"
+                                width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                                <div ng-if="Field.FIELD_NAME == 'EDIT'">
+                                    <input type="checkbox" class="form-control" ng-model="row.EDIT" style="width:15px;height:15px;" />
                                 </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-success" ng-click="AddEmail_Click()">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
+                                <div ng-if="Field.FIELD_NAME != 'EDIT'">
+                                    {{ row[Field.FIELD_NAME] }}
                                 </div>
                             </td>
                         </tr>

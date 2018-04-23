@@ -17,18 +17,6 @@ namespace FoodTruck.Controllers
         private String gSQL = "";
         private String mDBName = ConfigurationManager.AppSettings["SYSDBName"];
 
-        public JsonResult GetEventList()
-        {
-            DataTable dt = new DataTable();
-
-            gSQL = "EXEC [sp_Event_List] {0}";
-            gSQL = String.Format(gSQL,
-                        (Request.Form["ID"] != null && Request.Form["ID"] != "") ? "'" + Request.Form["ID"] + "'" : "null");
-            dt = odb.SqlQuery(gSQL, mDBName);
-
-            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-        }
-
         public JsonResult GetFoodtruckProfile()
         {
             DataTable dt = new DataTable();
@@ -54,143 +42,91 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult SubmitEvent()
+        public JsonResult GetDislikeMenuStyleList()
         {
             DataTable dt = new DataTable();
-            string ID = "0";
+            string SHOP_ID = "";
 
-            gSQL = "EXEC [dbo].[sp_Event_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
-            gSQL = String.Format(gSQL
-                                , Request.Form["EVENT_ID"]
-                                , Request.Form["EVENT_NAME"]
-                                , Request.Form["EVENT_PLACE"]
-                                , ismoUtil.ConvertAngularDateTo120(Request.Form["START_DATE"].ToString())
-                                , ismoUtil.ConvertAngularDateTo120(Request.Form["END_DATE"].ToString())
-                                , Request.Form["DESCRIPTION"]
-                                , Session[Cons.SS_USER_ID].ToString());
-            //Response.Write(gSQL); <---- use for push string to AngularJS
-            //Response.End();
-            dt = odb.SqlQuery(gSQL, mDBName);
-
-            if (Request.Form["EVENT_ID"] == "0" || Request.Form["EVENT_ID"] == "")
-                ID = dt.Rows[0]["EVENT_ID"].ToString();
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
             else
-                ID = Request.Form["EVENT_ID"];
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
 
-            gSQL = "EXEC [sp_Event_List] {0}";
-            gSQL = String.Format(gSQL,ID);
+            gSQL = "EXEC [sp_Dislike_Menu_Style_List] {0}";
+            gSQL = String.Format(gSQL, SHOP_ID);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetPlanShop()
+        public JsonResult GetDislikeMenuList()
         {
             DataTable dt = new DataTable();
+            string SHOP_ID = "";
 
-            if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
-            {
-                gSQL = "EXEC [sp_Plan_Shop] {0}";
-                gSQL = String.Format(gSQL,
-                             Session[Cons.SS_EVENT_ID].ToString());
-                dt = odb.SqlQuery(gSQL, mDBName);
-            }
-
-
-            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult SubmitPlan()
-        {
-            DataTable dt = new DataTable();
-
-            gSQL = "EXEC [dbo].[sp_Plan_Submit] '{0}','{1}','{2}','{3}'";
-            gSQL = String.Format(gSQL
-                                , Request.Form["EVENT_ID"]
-                                , Request.Form["WIDTH"]
-                                , Request.Form["DEPTH"]
-                                , Request.Form["GRID_SIZE"]);
-            dt = odb.SqlQuery(gSQL, mDBName);
-
-            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult SubmitPlanShop()
-        {
-            DataTable dt = new DataTable();
-
-            gSQL = "EXEC [dbo].[sp_Plan_Shop_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
-            gSQL = String.Format(gSQL
-                                , Request.Form["LOCAL_ID"]
-                                , Request.Form["EVENT_ID"]
-                                , Request.Form["NAME"]
-                                , Request.Form["PRICE"]
-                                , Request.Form["DEPOSIT_FEE_RATE"]
-                                , Request.Form["FT"]
-                                , Request.Form["BLOCK_ID"]);
-            dt = odb.SqlQuery(gSQL, mDBName);
-
-            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public JsonResult UploadCoverImage(HttpPostedFileBase File, string ID)
-        {
-            if (File != null && File.ContentLength > 0)
-            {
-                // Write file to Server
-                string gFileName = File.FileName;
-                string uploadLocationStr = "/Upload/Event/Cover/" + ID + "/";
-                string uploadLocation = Server.MapPath(uploadLocationStr);
-                string fileLocation = uploadLocationStr + gFileName;
-
-                DataService.UploadFileByLocation(File
-                                                , uploadLocation
-                                                , Server.MapPath(fileLocation));
-
-
-                //gSQL = String.Format("EXEC [sp_Leasing_Temp_Check] '{0}'"
-                gSQL = String.Format("EXEC [sp_Event_Cover_Upload] '{0}','{1}'"
-                                    , ID
-                                    , fileLocation);
-                DataTable dt = odb.SqlQuery(gSQL, mDBName);
-
-                return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-
-            }
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
             else
-            {
-                return Json(new { result = 500 });
-            }
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Dislike_Menu_List] '{0}'";
+            gSQL = String.Format(gSQL, SHOP_ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]
-        public JsonResult UploadPlanImage(HttpPostedFileBase File, string ID)
+        public JsonResult DeleteDislikeMenu()
         {
-            if (File != null && File.ContentLength > 0)
-            {
-                // Write file to Server
-                string gFileName = File.FileName;
-                string uploadLocationStr = "/Upload/Event/Plan/" + ID + "/";
-                string uploadLocation = Server.MapPath(uploadLocationStr);
-                string fileLocation = uploadLocationStr + gFileName;
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
 
-                DataService.UploadFileByLocation(File
-                                                , uploadLocation
-                                                , Server.MapPath(fileLocation));
-
-                gSQL = String.Format("EXEC [sp_Event_Plan_Upload] '{0}','{1}'"
-                                    , ID
-                                    , fileLocation);
-                DataTable dt = odb.SqlQuery(gSQL, mDBName);
-
-                return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
-
-            }
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
             else
-            {
-                return Json(new { result = 500 });
-            }
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Dislike_Menu_Style_Delete] '{0}'";
+            gSQL = String.Format(gSQL,SHOP_ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SubmitDislikeMenuStyle()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Dislike_Menu_Style_Submit] '{0}','{1}','{2}'";
+            gSQL = String.Format(gSQL,
+                        SHOP_ID,"0", Request.Form["ITEM_STYLE_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SubmitDislikeMenu()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Dislike_Menu_Style_Submit] '{0}','{1}','{2}'";
+            gSQL = String.Format(gSQL,
+                        SHOP_ID, "1", Request.Form["ITEM_STYLE_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
     }
 }
