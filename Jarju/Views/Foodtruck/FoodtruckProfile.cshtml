@@ -99,7 +99,7 @@
                                 width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
                                 <div ng-if="Field.FIELD_NAME == 'EDIT'">
                                     <input type="checkbox" class="form-control" ng-model="row.EDIT" style="width:15px;height:15px;" 
-                                           ng-click="itemStyleChecked(row)"/>
+                                           ng-click="itemStyleChecked(row)" indeterminate id="StyleCheckBox{{row.ITEM_STYLE_ID}}"/>
                                 </div>
                                 <div ng-if="Field.FIELD_NAME == 'NEXT'">
                                     <button type="button" class="btn btn-success" ng-click="DislikeDetail(row.ITEM_STYLE_ID)">
@@ -120,7 +120,7 @@
                                 ng-show="Field.VISIBILITY==1"
                                 width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
                                 <div ng-if="Field.FIELD_NAME == 'EDIT'">
-                                    <input type="checkbox" class="form-control" ng-model="row.EDIT" style="width:15px;height:15px;" />
+                                    <input type="checkbox" class="form-control" ng-model="row.EDIT" style="width:15px;height:15px;" ng-click="itemMenuChecked(row)"/>
                                 </div>
                                 <div ng-if="Field.FIELD_NAME != 'EDIT'">
                                     {{ row[Field.FIELD_NAME] }}

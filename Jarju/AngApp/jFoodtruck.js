@@ -53,6 +53,25 @@
             })
     }
 
+    $scope.$watchGroup(['DislikeMenuStyleList', 'DislikeMenuBaseList'], function (newValues, oldValues, scope) {
+        if ($scope.DislikeMenuBaseList.length > 0 && $scope.DislikeMenuStyleList.length > 0) {
+            var _dislike = $filter('filter')($scope.DislikeMenuStyleList, { 'EDIT': true }, true)
+            for (var i = 0; i < _dislike.length; i++) {
+                var _dislike2 = $filter('filter')($scope.DislikeMenuBaseList, { 'ITEM_STYLE_ID': _dislike[i].ITEM_STYLE_ID }, true);
+                angular.forEach(_dislike2, function (menu) { menu.EDIT = true; });
+            }
+
+            var _dislike = $filter('filter')($scope.DislikeMenuStyleList, { 'EDIT': false }, true)
+            for (var i = 0; i < _dislike.length; i++) {
+                var _dislike2 = $filter('filter')($scope.DislikeMenuBaseList, { 'EDIT': true, 'ITEM_STYLE_ID': _dislike[i].ITEM_STYLE_ID }, true);
+                if (_dislike2.length > 0) {
+                    var checkbox = document.getElementById("StyleCheckBox" + _dislike[i].ITEM_STYLE_ID);
+                    checkbox.indeterminate = true;
+                }
+            }
+        }
+    });
+
     $scope.OrderColumn = function (pColName) {
         $scope.sortType = pColName;
         $scope.sortReverse = !$scope.sortReverse;
@@ -72,6 +91,24 @@
     $scope.itemStyleChecked = function (item) {
         $scope.selectedDislikeMenuList = $filter('filter')($scope.DislikeMenuBaseList, { 'ITEM_STYLE_ID': item.ITEM_STYLE_ID }, true);
         angular.forEach($scope.selectedDislikeMenuList, function (menu) { menu.EDIT = item.EDIT; });
+    }
+
+    $scope.itemMenuChecked = function (item) {
+        $scope.selectedDislikeMenuList = $filter('filter')($scope.DislikeMenuList, { 'EDIT': true }, true);
+        if ($scope.selectedDislikeMenuList.length == $scope.DislikeMenuList.length) {
+            $scope.selectedDislikeMenuStyleList = $filter('filter')($scope.DislikeMenuStyleList, { 'ITEM_STYLE_ID': item.ITEM_STYLE_ID }, true);
+            angular.forEach($scope.selectedDislikeMenuStyleList, function (menu) { menu.EDIT = item.EDIT; });
+            var checkbox = document.getElementById("StyleCheckBox" + item.ITEM_STYLE_ID);
+            checkbox.indeterminate = false;
+        } else if ($scope.selectedDislikeMenuList.length > 0) {
+            var checkbox = document.getElementById("StyleCheckBox" + item.ITEM_STYLE_ID);
+            checkbox.indeterminate = true;
+        } else {
+            $scope.selectedDislikeMenuStyleList = $filter('filter')($scope.DislikeMenuStyleList, { 'ITEM_STYLE_ID': item.ITEM_STYLE_ID }, true);
+            angular.forEach($scope.selectedDislikeMenuStyleList, function (menu) { menu.EDIT = item.EDIT; });
+            var checkbox = document.getElementById("StyleCheckBox" + item.ITEM_STYLE_ID);
+            checkbox.indeterminate = false;
+        }
     }
 
     $scope.BacktoDislikeMenuStyle = function () {
