@@ -31,10 +31,11 @@
                     <div class="col-md-5 navbar-collapse collapse" style="float:right;">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
                         {
-                            <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
-                                <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
-                                <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
-                            </div>
+                        <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
+                            <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
+                            <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssShopID"]</a> |
+                            <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
+                        </div>
                         }
                         else
                         {
@@ -63,6 +64,7 @@
                 </button>
                 <div class="dropdown-content">
                     <a href="@Url.Action("FoodtruckProfile", "Foodtruck")" style="font-size:9pt">Profile</a>
+                    <a href="@Url.Action("EventRegisterView", "Foodtruck")" style="font-size:9pt">Register event</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -203,11 +205,9 @@
     <script src="~/AngApp/AppFoodTruck.js"></script>
     <script src="~/AngApp/FactoryServices.js"></script>
     <script src="~/AngApp/jConfiguration.js"></script>
-    <script src="~/AngApp/jOperation.js"></script>
     <script src="~/AngApp/jEvent.js"></script>
     <script src="~/AngApp/jFoodtruck.js"></script>
     <script src="~/AngApp/jMenu.js"></script>
-    <script src="https://cdn.rawgit.com/bradberger/angular-material-calendar/master/dist/angular-material-calendar.js"></script>
 
     <link href="~/bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css" rel="stylesheet">
     <script src="~/bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.js"></script>

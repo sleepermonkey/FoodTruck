@@ -98,13 +98,21 @@ namespace Jarju.Controllers
             //        odb.SqlExecute(gSQL, mDBName);
 
 
-
-            Session.Add(Cons.SS_USER_ID, '1');
+            if(user.Contains("or"))
+            {
+                Session.Add(Cons.SS_USER_ID, user.Replace("or", ""));
+                Session.Add(Cons.SS_USER_ROLE, '1');//1 = Organizer 2 = Food Truck 3 = Customer
+            }
+            else if(user.Contains("ft"))
+            {
+                Session.Add(Cons.SS_USER_ID, user.Replace("ft",""));
+                Session.Add(Cons.SS_USER_ROLE, '2');
+                Session.Add(Cons.SS_SHOP_ID, user.Replace("ft", ""));
+            }
+            
             Session.Add(Cons.SS_USER_NAME, usrname);
             Session.Add(Cons.SS_USER_LAST_NAME, '1');
-            Session.Add(Cons.SS_USER_ROLE, '1'); //1 = Organizer 2 = Food Truck 3 = Customer
             Session.Add(Cons.SS_USER_LANG, '1');
-            Session.Add(Cons.SS_SHOP_ID, '1');
 
             return RedirectToAction("Index", "Home");
             //    }

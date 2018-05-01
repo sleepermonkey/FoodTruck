@@ -6,7 +6,7 @@
                 $http.get(window.location.origin + SYSTEM_PATH + '/GetHeaderGridView/' + cs)
                     .then(function (res) {
                         resolve(res.data);
-                        console.log(window.location.origin + SYSTEM_PATH + '/GetHeaderGridView/' + cs);
+                        //console.log(window.location.origin + SYSTEM_PATH + '/GetHeaderGridView/' + cs);
                     }, function (error) {
                         alert('พบข้อผิดพลาดในการติดต่อเชิร์ฟเวอร์ :' + error.statusText);
                         reject(error);
@@ -19,7 +19,7 @@
                 $http.get(window.location.origin + SYSTEM_PATH + '/GetReportList/' + cs)
                     .then(function (res) {
                         resolve(res.data);
-                        console.log(window.location.origin + SYSTEM_PATH + '/GetReportList/' + cs);
+                        //console.log(window.location.origin + SYSTEM_PATH + '/GetReportList/' + cs);
                     }, function (error) {
                         alert('พบข้อผิดพลาดในการติดต่อเชิร์ฟเวอร์ :' + error.statusText);
                         reject(error);
@@ -32,7 +32,7 @@
                 $http.get(window.location.origin + servicePath + '/' + action + '/')
                     .then(function (res) {
                         resolve(res.data);
-                        console.log(window.location.origin + servicePath + '/' + action + '/');
+                        //console.log(window.location.origin + servicePath + '/' + action + '/');
                     }, function (error) {
                         alert('พบข้อผิดพลาดในการติดต่อเชิร์ฟเวอร์ :' + error.statusText);
                         reject(error);
@@ -45,7 +45,7 @@
                 $http.get(window.location.origin + servicePath + '/' + action + '/' + param)
                     .then(function (res) {
                         resolve(res.data);
-                        console.log(window.location.origin + servicePath + '/' + action + '/' + param);
+                        //console.log(window.location.origin + servicePath + '/' + action + '/' + param);
                     }, function (error) {
                         alert('พบข้อผิดพลาดในการติดต่อเชิร์ฟเวอร์ :' + error.statusText);
                         reject(error);

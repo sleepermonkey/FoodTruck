@@ -5,7 +5,6 @@ app.constant('EVENT_PATH', '/EventDS');
 app.constant('FT_PATH', '/FoodtruckDS');
 app.constant('MENU_PATH', '/MenuDS');
 app.constant('CONFIG_PATH', '/ConfigDS');
-app.constant('OPERATION_PATH', '/OperationDs');
 //app.constant('REPORT_PATH', '/WSYS/mllReport.aspx?rid=');
 
 app.config([

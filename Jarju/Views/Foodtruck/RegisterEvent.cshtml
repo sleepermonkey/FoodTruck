@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "Menu Type";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="RegisterEventController" style="width:100%">
+    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 100%; font-size: 10pt">
+        <div class="row hdBar">
+            <div class="col-sm-3"><h4>Event Register</h4></div>
+            <div class="col-sm-9" style="margin-top:6px;text-align:right;">
+                <button type="button" class="btn btn-primary" ng-click="registerEvent()">
+                    <span class="glyphicon glyphicon-floppy-save"></span> Save
+                </button>
+            </div>
+        </div>
+        <div id="EditItem" class="row">
+            <div id="CustomerInfo" class="col-sm-5">
+                <div class="row custom-row" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0">
+                    <div class="col-md-4">
+                        ID:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.EVENT_ID" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Name:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.EVENT_NAME" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Start Date:
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group date custom-datebox" ng-click="openStartDate()">
+                            <input datetimepicker-neutral-timezone current-date type="text" class="form-control" ng-model="formData.Event.START_DATE"
+                                   uib-datepicker-popup="{{dateFormat}}" is-open="popupStartDate.opened"
+                                   ng-change="startDate_Change()" ng-disabled="true">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        End Date:
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group date custom-datebox" ng-click="openEndDate()">
+                            <input datetimepicker-neutral-timezone current-date type="text" class="form-control" ng-model="formData.Event.END_DATE"
+                                   uib-datepicker-popup="{{dateFormat}}" is-open="popupEndDate.opened" ng-disabled="true">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Place:
+                    </div>
+                    <div class="col-md-8">
+                        <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.Event.EVENT_PLACE" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Description:
+                    </div>
+                    <div class="col-md-8">
+                        <textarea class="form-control" rows="3" placeholder="Description" ng-model="formData.Event.DESCRIPTION" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7" style="margin-top:10px;">
+                <table id="PlanGrid" border="1" class="theme-table"
+                       style="position: relative;table-layout:fixed;width:{{TableWidth}}px;height:{{TableHeight}}px;">
+                    <tbody>
+                        <tr style="width:150px;height:150px;">
+                            <td ng-repeat="_date in EventDate"
+                                style="width:150px;height:150px;padding:3px;" valign="top">
+                                <div style="height:80%">
+                                    <p ng-bind="_date.ED | date:'dd/MM/yyyy'"></p>
+                                </div>
+                                <div style="height:20%">
+                                    <input type="checkbox" class="form-control" ng-model="_date.SELECTED" style="width:15px;height:15px;"
+                                           ng-click="dateCheck()" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                Total Days : {{TotalDays}}
+            </div>
+        </div>
+    </div>
+    <div style="height:20px"></div>
+</div>
+

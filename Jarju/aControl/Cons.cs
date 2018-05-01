@@ -16,9 +16,9 @@ namespace FoodTruck.aControl
 
 
         //-------------- Event Session --------------------------
-        public const string SS_EVENT_ID = "0";
+        public const string SS_EVENT_ID = "ssEventID";
 
         //-------------- Event Session --------------------------
-        public const string SS_SHOP_ID = "0";
+        public const string SS_SHOP_ID = "ssShopID";
     }
 }

@@ -48,14 +48,26 @@ namespace FoodTruck.Controllers
         {
             DataTable dt = new DataTable();
             string ID = "0";
+            string sDate = Request.Form["START_DATE"].ToString();
+            string eDate = Request.Form["END_DATE"].ToString();
+
+            if (sDate.Length >= 24)
+            {
+                sDate = ismoUtil.ConvertAngularDateTo120(sDate);
+            }
+                
+            if (eDate.Length >= 24)
+            {
+                eDate = ismoUtil.ConvertAngularDateTo120(eDate);
+            }
 
             gSQL = "EXEC [dbo].[sp_Event_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
             gSQL = String.Format(gSQL
                                 , Request.Form["EVENT_ID"]
                                 , Request.Form["EVENT_NAME"]
                                 , Request.Form["EVENT_PLACE"]
-                                , ismoUtil.ConvertAngularDateTo120(Request.Form["START_DATE"].ToString())
-                                , ismoUtil.ConvertAngularDateTo120(Request.Form["END_DATE"].ToString())
+                                , sDate
+                                , eDate
                                 , Request.Form["DESCRIPTION"]
                                 , Session[Cons.SS_USER_ID].ToString());
             //Response.Write(gSQL); <---- use for push string to AngularJS
@@ -118,6 +130,60 @@ namespace FoodTruck.Controllers
                                 , Request.Form["DEPOSIT_FEE_RATE"]
                                 , Request.Form["FT"]
                                 , Request.Form["BLOCK_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetRegisterFT()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Shop_Registered_List] '{0}'";
+            gSQL = String.Format(gSQL
+                                , Session[Cons.SS_EVENT_ID].ToString());
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetRegisterFTCount()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Shop_Registered_Count_List] '{0}'";
+            gSQL = String.Format(gSQL
+                                , Session[Cons.SS_EVENT_ID].ToString());
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetRegisterFTMenu()
+        {
+            DataTable dt = new DataTable();
+            gSQL = "EXEC [sp_Own_Menu_List] '{0}'";
+            gSQL = String.Format(gSQL, Request.Form["SHOP_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetRegisterFTDislikeMenu()
+        {
+            DataTable dt = new DataTable();
+            gSQL = "EXEC [sp_Dislike_Menu_List] '{0}'";
+            gSQL = String.Format(gSQL, Request.Form["SHOP_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetRegisterFTDislikeStyle()
+        {
+            DataTable dt = new DataTable();
+            gSQL = "EXEC [sp_Dislike_Menu_Style_List] '{0}'";
+            gSQL = String.Format(gSQL, Request.Form["SHOP_ID"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);

@@ -194,7 +194,6 @@
     <Content Include="AngApp\jMenu.js" />
     <Content Include="AngApp\jFoodtruck.js" />
     <Content Include="AngApp\jEvent.js" />
-    <Content Include="AngApp\jOperation.js" />
     <Content Include="AngApp\jConfiguration.js" />
     <Content Include="bower_components\angular-bootstrap-calendar\dist\css\angular-bootstrap-calendar.css" />
     <Content Include="bower_components\angular-bootstrap-calendar\dist\css\angular-bootstrap-calendar.min.css" />
@@ -1352,9 +1351,6 @@
     <Content Include="Views\Config\MenuType.cshtml" />
     <Content Include="Views\Config\MenuCategory.cshtml" />
     <Content Include="Views\Config\BuffetPackage.cshtml" />
-    <Content Include="Views\Operation\Customer.cshtml" />
-    <Content Include="Views\Operation\Calendar.cshtml" />
-    <Content Include="Views\Operation\TestGrid.cshtml" />
     <Content Include="Views\Event\CreateEvent.cshtml" />
     <Content Include="Views\Event\ManageEvent.cshtml" />
     <Content Include="Views\Event\EventFloorPlan.cshtml" />
@@ -1362,6 +1358,8 @@
     <Content Include="Views\Menu\MenuType.cshtml" />
     <Content Include="Views\Menu\MenuStyle.cshtml" />
     <Content Include="Views\Menu\Menu.cshtml" />
+    <Content Include="Views\Foodtruck\EventRegisterView.cshtml" />
+    <Content Include="Views\Foodtruck\RegisterEvent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

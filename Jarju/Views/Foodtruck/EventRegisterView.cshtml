@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "ค้นหาอีเวนท์";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" style="width:100%;" ng-app="FoodTruck_Module" ng-controller="EventRegisterViewController">
+    <div class="container" style="width:100%;">
+        <div class="row" ng-repeat="events in ListEvent" style="display: flex;align-items: center;justify-content: center;">
+            <div class="col-sm-3 eventBox" ng-repeat="event in events" ng-click="openEvent(event.EVENT_ID)">
+                <div>
+                    <img ng-src="{{event.COVER_PATH}}" style="position: absolute;max-width: 100%;max-height: 100%;" />
+                </div>
+                <div style="margin-top:180px">
+                    {{event.EVENT_ID}}
+                    {{event.COVER_PATH}}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div id="DetailModal" class="w3-modal w3-display-topmiddle" style="width:100%;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DetailModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+            <div class="col-sm-12 hdBar">
+                <div class="col-sm-9"><h4>{{formData.EventDetail.EVENT_NAME}}</h4></div>
+                <div class="col-sm-3" style="margin-top:6px;text-align:right;">
+                    <a class="btn btn-primary" href="/Foodtruck/RegisterEvent/{{formData.EventDetail.EVENT_ID}}">
+                        Register
+                    </a>
+                </div>
+            </div>
+            <div id="EditItem" class="row">
+                <form name="dealerConf">
+                    <div class="row custom-row">
+                        <img ng-src="{{formData.EventDetail.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-12">
+                            {{formData.EventDetail.DESCRIPTION}}
+                        </div>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

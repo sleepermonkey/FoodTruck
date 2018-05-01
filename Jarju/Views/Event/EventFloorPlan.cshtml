@@ -30,13 +30,13 @@
         </div>
         <div class="col-md-3" align="right">
             <label class="btn btn-success btn-file" ng-click="selectBlock()">
-                Select Food Truck Group
+                Plan Detail
                 <span class="glyphicon glyphicon-chevron-right"></span>
             </label>
         </div>
     </div>
     <div class="row custom-row" style="font-size:10pt;border-bottom:solid;border-width:thin;border-color:#F0F0F0;" ng-hide="planMode != 1">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="btn btn-success btn-file" ng-click="backToDrawPlan()">
                 <span class="glyphicon glyphicon-chevron-left"></span>
                 Back
@@ -56,10 +56,14 @@
             </label>
             <input class="form-control" value="{{EndBlock}}" ng-disabled="true" style="width:75px;" />
         </div>
-        <div class="col-md-3" align="right">
+        <div class="col-md-4" align="right">
             <label class="btn btn-success btn-file" ng-click="planBlockSubmit()">
                 <span class="glyphicon glyphicon-save-file"></span>&nbsp;
                 Save
+            </label>
+            <label class="btn btn-success btn-file" ng-click="calculateFTList()">
+                Food Truck Schedule
+                <span class="glyphicon glyphicon-chevron-right"></span>
             </label>
         </div>
     </div>
@@ -243,5 +247,21 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row custom-row" style="font-size:10pt" ng-hide="planMode != 3">
+        <table id="PlanGrid" border="1" class="theme-table"
+               style="position: relative;table-layout:fixed;width:{{TableWidth}}px;height:{{TableHeight}}px;">
+            <tbody>
+                <tr style="width:150px;height:150px;" ng-repeat="shops in FTRegister track by $index">
+                    <td style="width:150px;height:150px;padding:3px;" valign="top" ng-repeat="shop in shops track by $index">
+                        <div>
+                            <p ng-bind="shop.START_DATE | date:'dd/MM/yyyy'"></p>
+                            <p>Area : {{shop.LOCAL_ID}}</p>
+                            <p>Shop name : {{shop.SHOP_NAME}}</p>
+</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
