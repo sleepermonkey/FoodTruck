@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "Customer information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="CreateEventController" style="width:100%;height:75vh;">
+    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 100%; font-size: 10pt">
+        <div class="row hdBar">
+            <div class="col-sm-9"><h4>View Event</h4></div>
+            <div class="col-sm-3" style="margin-top:6px;text-align:right;">
+                <button type="button" class="btn btn-primary" ng-click="editEventPlan()" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0">
+                    <span class="glyphicon glyphicon-tent"></span> Event Floor Plan
+                </button>
+            </div>
+        </div>
+        <div id="EditItem" class="row">
+            <div id="CustomerInfo" class="col-sm-5">
+                <div class="row custom-row" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0">
+                    <div class="col-md-4">
+                        ID:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.EVENT_ID" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Name:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.Event.EVENT_NAME" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Start Date:
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group date custom-datebox" ng-click="openStartDate()">
+                            <input datetimepicker-neutral-timezone current-date type="text" class="form-control" ng-model="formData.Event.START_DATE"
+                                   uib-datepicker-popup="{{dateFormat}}" is-open="popupStartDate.opened"
+                                   ng-change="startDate_Change()" ng-disabled="true">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        End Date:
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group date custom-datebox" ng-click="openEndDate()">
+                            <input datetimepicker-neutral-timezone current-date type="text" class="form-control" ng-model="formData.Event.END_DATE"
+                                   uib-datepicker-popup="{{dateFormat}}" is-open="popupEndDate.opened" ng-disabled="true">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Place:
+                    </div>
+                    <div class="col-md-8">
+                        <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.Event.EVENT_PLACE" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Description:
+                    </div>
+                    <div class="col-md-8">
+                        <textarea class="form-control" rows="3" placeholder="Description" ng-model="formData.Event.DESCRIPTION" ng-disabled="true"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-7" style="margin-top:10px;">
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center">
+                                Event Cover image
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row">
+                            <td class="tblDetail">
+                                <img ng-src="{{formData.Event.COVER_PATH}}" style="max-width: 100%;max-height: 300px;" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+    </div>
+</div>

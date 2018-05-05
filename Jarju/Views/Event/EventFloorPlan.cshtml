@@ -171,6 +171,25 @@
                     <input type="text" class="form-control" name="foodmenuname" ng-model="SelectedShop.BLOCK_ID" format-numeric>
                 </div>
             </div>
+            <hr />
+            <div class="row custom-row">
+                <div class="col-md-5">
+                    Food Truck :
+                </div>
+                <div class="col-md-7">
+                    <select ng-model="formData.InviteFT.SHOP_ID" class="form-control" convert-to-number>
+                        <option ng-repeat="ft in AllFT" value="{{ft.SHOP_ID}}">{{ft.SHOP_NAME}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row custom-row" align="right">
+                <div class="col-md-12">
+                    <label class="btn btn-success btn-file" ng-click="inviteFoodTruck()">
+                        <span class="glyphicon glyphicon-envelope"></span>&nbsp;
+                        Invite
+                    </label>
+                </div>
+            </div>
         </div>
         <div class="theme col-sm-8" style="margin-left:20px;border-left:solid;border-width:thin;border-color:#A0A0A0;overflow:auto;">
             <drawing width="500" height="300" rectangle-list='rectangles' style="position: absolute;z-index:1;"></drawing>
@@ -258,10 +277,14 @@
                             <p ng-bind="shop.START_DATE | date:'dd/MM/yyyy'"></p>
                             <p>Area : {{shop.LOCAL_ID}}</p>
                             <p>Shop name : {{shop.SHOP_NAME}}</p>
-</div>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <label class="btn btn-success btn-file" ng-click="submitSchedule()">
+            <span class="glyphicon glyphicon-save-file"></span>&nbsp;
+            Save
+        </label>
     </div>
 </div>

@@ -5,7 +5,7 @@
 }
 
 <div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="FoodTruckProfileController" style="width:100%;height:100%;">
-    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 500px; font-size: 10pt">
+    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="font-size: 10pt">
         <div class="row hdBar">
             <div class="col-sm-9"><h4>Food Truck Profile</h4></div>
             <div class="col-sm-3" style="margin-top:6px;text-align:right;">
@@ -34,10 +34,55 @@
                     </div>
                 </div>
                 <br>
-                <div class="row custom-row">
-                    <div class="col-md-3"></div>
-
-                </div>
+                <hr />
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center" colspan="3">
+                                Invited
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in formData.Invited | orderBy:sortType:sortReverse">
+                            <td class="tblDetail">
+                                <div>
+                                    <a class="sm-btn-view glyphicon glyphicon-envelope" ng-click="acceptInvited(row.EVENT_ID)">
+                                    </a>
+                                    <a class="sm-btn-view glyphicon glyphicon-remove" ng-click="declineInvited(row.EVENT_ID)">
+                                    </a>
+                                    <a href="/Event/ViewEvent/{{row['EVENT_ID']}}">{{row.EVENT_NAME}}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center" colspan="3">
+                                Next Event
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in formData.NextEvent | orderBy:sortType:sortReverse">
+                            <td class="tblDetail">
+                                <div>
+                                    <a href="/Event/ViewEvent/{{row['EVENT_ID']}}">{{row.EVENT_NAME}}</a>
+                                </div>
+                                <div>
+                                    From : <a href="#">{{row.START_DATE}}</a>
+                                    To : <a href="#">{{row.END_DATE}}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="col-sm-4" style="margin-top:10px;">
                 <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">

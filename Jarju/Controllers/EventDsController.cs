@@ -117,6 +117,22 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult InviteFoodTruck()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Shop_Event_Invite] '{0}','{1}','{2}','{3}','{4}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["SHOP_ID"]
+                                , Request.Form["LOCAL_ID"]
+                                , ismoUtil.ConvertAngularDateTo120(Request.Form["START_DATE"].ToString())
+                                , '2');
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult SubmitPlanShop()
         {
             DataTable dt = new DataTable();

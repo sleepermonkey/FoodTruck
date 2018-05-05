@@ -16,6 +16,13 @@ namespace Jarju.Controllers
             return View();
         }
 
+        public ActionResult ViewEvent(string id)
+        {
+            ViewBag.PageTitle = "View Event";
+            Session[Cons.SS_EVENT_ID] = id;
+            return View();
+        }
+
         public ActionResult ManageEvent()
         {
             ViewBag.PageTitle = "Manage Event";

@@ -42,6 +42,90 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetInvited()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+            gSQL = "EXEC [sp_Shop_Invited_List] '{0}'";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = String.Format(gSQL,
+                            SHOP_ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult AcceptInvied()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+            gSQL = "EXEC [sp_Shop_Invited_Accept] '{0}','{1}'";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = String.Format(gSQL,
+                            SHOP_ID,
+                            Request.Form["EVENT_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetNextEvent()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+            gSQL = "EXEC [sp_Shop_Event_List] '{0}'";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = String.Format(gSQL,
+                            SHOP_ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeclineInvied()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+            gSQL = "EXEC [sp_Shop_Invited_Decline] '{0}','{1}'";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = String.Format(gSQL,
+                            SHOP_ID,
+                            Request.Form["EVENT_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetFoodtruckList()
+        {
+            DataTable dt = new DataTable();
+            gSQL = "EXEC [sp_Shop] null,null";
+            
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetDislikeMenuStyleList()
         {
             DataTable dt = new DataTable();

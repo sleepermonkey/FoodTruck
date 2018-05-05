@@ -74,6 +74,22 @@
             }, function (error) {
                 console.log('Unable to load event data: ' + error.message)
             })
+
+        BaseService.GetDataTable(FT_PATH, "GetInvited")
+            .then(function (result) {
+                console.log(result);
+                $scope.formData.Invited = result;
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+
+        BaseService.GetDataTable(FT_PATH, "GetNextEvent")
+            .then(function (result) {
+                console.log(result);
+                $scope.formData.NextEvent = result;
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
     }
 
     $scope.$watchGroup(['DislikeMenuStyleList', 'DislikeMenuBaseList'], function (newValues, oldValues, scope) {
@@ -215,6 +231,51 @@
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit menu type data: ' + error.message)
+            });
+    }
+
+    $scope.acceptInvited = function (EVENT_ID) {
+        BaseService.Message.confirm('Accept Invite?')
+            .then(function () {
+                let scopeData = { 'EVENT_ID': EVENT_ID};
+                let data = $.param(scopeData)
+                BaseService.CallAction(FT_PATH, "AcceptInvied", data)
+                    .then(function (result) {
+                        BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+                        BaseService.GetDataTable(FT_PATH, "GetInvited")
+                            .then(function (result) {
+                                console.log(result);
+                                $scope.formData.Invited = result;
+                            }, function (error) {
+                                console.log('Unable to load event data: ' + error.message)
+                            });
+                    }, function (error) {
+                        BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                        console.log('Unable to edit menu type data: ' + error.message)
+                    });
+            });
+        
+    }
+
+    $scope.declineInvited = function (EVENT_ID) {
+        BaseService.Message.confirm('Decline Invite?')
+            .then(function () {
+                let scopeData = { 'EVENT_ID': EVENT_ID };
+                let data = $.param(scopeData)
+                BaseService.CallAction(FT_PATH, "DeclineInvied", data)
+                    .then(function (result) {
+                        BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+                        BaseService.GetDataTable(FT_PATH, "GetInvited")
+                            .then(function (result) {
+                                console.log(result);
+                                $scope.formData.Invited = result;
+                            }, function (error) {
+                                console.log('Unable to load event data: ' + error.message)
+                            });
+                    }, function (error) {
+                        BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                        console.log('Unable to edit menu type data: ' + error.message)
+                    });
             });
     }
 })

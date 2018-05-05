@@ -284,6 +284,9 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         $scope.TableHeight = 0;
         $scope.FTRegister = [];
 
+        $scope.formData.InviteFT = {};
+        $scope.AllFT = [];
+
         BaseService.CallAction(EVENT_PATH, "GetEvent", null)
             .then(function (result) {
                 $scope.formData.Event = result[0];
@@ -319,6 +322,15 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     });
                 }
 
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
+
+        BaseService.CallAction(FT_PATH, "GetFoodtruckList", null)
+            .then(function (result) {
+                $scope.AllFT = result;
+                console.log($scope.AllFT);
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
@@ -834,6 +846,43 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         }
     }
 
+    $scope.inviteFoodTruck = function () {
+        if ($scope.SelectedShop.LOCAL_ID == null) {
+            BaseService.Message.alert('Please select Position to invite');
+            return;
+        }
+
+        if ($scope.formData.InviteFT.SHOP_ID == null) {
+            BaseService.Message.alert('Please select Food Truck');
+            return;
+        }
+
+        var EndDate = new Date($scope.formData.Event.END_DATE);
+        var StartDate = new Date($scope.formData.Event.START_DATE);
+        var timeDiff = Math.abs(EndDate.getTime() - StartDate.getTime());
+        var DayLength = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+
+        for (var i = 0; i < DayLength; i++) {
+            var _date = new Date($scope.formData.Event.START_DATE);
+            _date.setDate(_date.getDate() + i);
+
+            var EventDate = {
+                'EVENT_ID': $scope.formData.Event.EVENT_ID,
+                'SHOP_ID': $scope.formData.InviteFT.SHOP_ID,
+                'LOCAL_ID': $scope.SelectedShop.LOCAL_ID,
+                'START_DATE': _date
+            };
+            var scopeData = EventDate;
+            data = $.param(scopeData);
+            BaseService.CallAction(EVENT_PATH, "InviteFoodTruck", data)
+                .then(function (result) {
+                }, function (error) {
+                    error = true;
+                    console.log('Unable to edit plan shop data: ' + error.message)
+                })
+        }
+    }
+
     $scope.$watch('CurrentInsertGroup', function (newVal, oldVal) {
         if (newVal != 0 && newVal != null) {
             $scope.CurrentInsertBlock = 0;
@@ -873,8 +922,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
             }
         }
         
-        $scope.StartGroup = null;
-        $scope.EndGroup = null;
+        $scope.StartBlock = null;
+        $scope.EndBlock = null;
     }
 
     $scope.backToDrawPlan = function () {
@@ -1337,10 +1386,10 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 if (SwSn > shopInBlock.length / 2)
                     break;
             }
+        }
 
-            if (SwSn < shopInBlock.length / 2) {
-                CalculateSwSnLess2Left(DayLength, shopInBlock, SwSn);
-            }
+        if (SwSn < shopInBlock.length / 2) {
+            CalculateSwSnLess2Left(DayLength, shopInBlock, SwSn);
         }
     }
 
@@ -1354,47 +1403,203 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     if (FTMenuFood != null && FTMenuFood.length > 0 && FTMenuFood[0].ITEM_TYPE_ID != 1 && FTMenuFood[0].ITEM_TYPE_ID != 4) {
                         var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
                         for (var j = 0; j < FTRegisterDate.length; j++) {
-                                var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                if (FTR == null || FTR.length == 0) {
+                            var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                            if (FTR == null || FTR.length == 0) {
+                                var FTDislike = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var FTDislikeStyle = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var _near = $filter('filter')($scope.NearList, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var _near2 = $filter('filter')($scope.NearList, { 'NEAR_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var dislike = false;
+
+                                if (_near.length > 0) {
+                                    for (var _FT = 0; _FT < _near.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near[_FT].NEAR_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (_near2.length > 0) {
+                                    for (var _FT = 0; _FT < _near2.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near2[_FT].LOCAL_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!dislike) {
                                     FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
                                     FTRegisterDate[j].STATUS = 1;
                                     DayLength2--;
+                                }
 
-                                    if (DayLength2 == 0) {
-                                        SwSn++;
-                                        break;
-                                    }
+                                if (DayLength2 == 0) {
+                                    SwSn++;
+                                    break;
                                 }
                             }
-                            if (DayLength2 == 0)
-                                break;
-                    }
-                }
-
-                if (DayLength2 > 0) {
-                    for (var FTIndex = 0; FTIndex < $scope.RegisterShopAmount.length; FTIndex++) {
-                        var FTRegistered = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
-                        var FTMenuFood = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
-                        if (FTMenuFood != null && FTMenuFood.length > 0 && FTMenuFood[0].ITEM_TYPE_ID != 1 && FTMenuFood[0].ITEM_TYPE_ID != 4) {
-                            var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
-                            for (var j = 0; j < FTRegisterDate.length; j++) {
-                                var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                if (FTR == null || FTR.length == 0) {
-                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                    FTRegisterDate[j].STATUS = 1;
-                                    DayLength2--;
-
-                                    if (DayLength2 == 0) {
-                                        SwSn++;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (DayLength2 == 0)
-                                break;
                         }
+                        if (DayLength2 == 0)
+                            break;
                     }
                 }
+
+                if (SwSn > shopInBlock.length / 2)
+                    break;
             }
 
             if (SwSn > shopInBlock.length / 2)
@@ -1420,44 +1625,191 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                         for (var j = 0; j < FTRegisterDate.length; j++) {
                             var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
                             if (FTR == null || FTR.length == 0) {
-                                FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                FTRegisterDate[j].STATUS = 1;
-                                DayLength2--;
+                                var FTDislike = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var FTDislikeStyle = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var _near = $filter('filter')($scope.NearList, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var _near2 = $filter('filter')($scope.NearList, { 'NEAR_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var dislike = false;
 
-                                if (DayLength2 == 0) {
-                                    break;
+                                if (_near.length > 0) {
+                                    for (var _FT = 0; _FT < _near.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near[_FT].NEAR_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (_near2.length > 0) {
+                                    for (var _FT = 0; _FT < _near2.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near2[_FT].LOCAL_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!dislike) {
+                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
+                                    FTRegisterDate[j].STATUS = 1;
+                                    DayLength2--;
                                 }
                             }
                         }
                         if (DayLength2 == 0)
                             break;
-                    }
-                }
-
-                if (DayLength2 > 0) {
-                    for (var FTIndex = 0; FTIndex < $scope.RegisterShopAmount.length; FTIndex++) {
-                        var FTMenuFood = $filter('filter')($scope.ShopMenu, { 'ITEM_TYPE_ID': 1, 'MAIN_ITEM': true, 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
-                        if (FTMenuFood != null && FTMenuFood.length > 0) {
-                            var LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                            var FTRegistered = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
-                            var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
-                            if (FTRegisterDate.length >= DayLength2) {
-                                for (var j = 0; j < FTRegisterDate.length; j++) {
-                                    var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                    if (FTR == null || FTR.length == 0) {
-                                        FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                        FTRegisterDate[j].STATUS = 1;
-                                        DayLength2--;
-
-                                        if (DayLength2 == 0)
-                                            break;
-                                    }
-                                }
-
-                                if (DayLength2 == 0)
-                                    break;
-                            }
-                        }
                     }
                 }
             }
@@ -1530,9 +1882,187 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                         for (var j = 0; j < FTRegisterDate.length; j++) {
                             var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
                             if (FTR == null || FTR.length == 0) {
-                                FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                FTRegisterDate[j].STATUS = 1;
-                                DayLength2--;
+                                var FTDislike = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var FTDislikeStyle = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var _near = $filter('filter')($scope.NearList, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var _near2 = $filter('filter')($scope.NearList, { 'NEAR_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var dislike = false;
+
+                                if (_near.length > 0) {
+                                    for (var _FT = 0; _FT < _near.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near[_FT].NEAR_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (_near2.length > 0) {
+                                    for (var _FT = 0; _FT < _near2.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near2[_FT].LOCAL_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!dislike) {
+                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
+                                    FTRegisterDate[j].STATUS = 1;
+                                    DayLength2--;
+                                }
 
                                 if (DayLength2 == 0) {
                                     SwSn++;
@@ -1542,35 +2072,11 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                         }
                         if (DayLength2 == 0)
                             break;
-                        
                     }
                 }
 
-                if (DayLength2 > 0) {
-                    for (var FTIndex = 0; FTIndex < $scope.RegisterShopAmount.length; FTIndex++) {
-                        var FTRegistered = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
-                        var FTMenuFood = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
-                        if (FTMenuFood != null && FTMenuFood.length > 0 && FTMenuFood[0].ITEM_TYPE_ID != 1 && FTMenuFood[0].ITEM_TYPE_ID != 4) {
-                            var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
-                            for (var j = 0; j < FTRegisterDate.length; j++) {
-                                var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                if (FTR == null || FTR.length == 0) {
-                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                    FTRegisterDate[j].STATUS = 1;
-                                    DayLength2--;
-
-                                    if (DayLength2 == 0) {
-                                        SwSn++;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (DayLength2 == 0) {
-                                break;
-                            }
-                        }
-                    }
-                }
+                if (SwSn > shopInBlock.length / 2)
+                    break;
             }
 
             if (SwSn > shopInBlock.length / 2)
@@ -1594,9 +2100,187 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                         for (var j = 0; j < FTRegisterDate.length; j++) {
                             var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
                             if (FTR == null || FTR.length == 0) {
-                                FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                FTRegisterDate[j].STATUS = 1;
-                                DayLength2--;
+                                var FTDislike = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var FTDislikeStyle = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var _near = $filter('filter')($scope.NearList, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var _near2 = $filter('filter')($scope.NearList, { 'NEAR_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var dislike = false;
+
+                                if (_near.length > 0) {
+                                    for (var _FT = 0; _FT < _near.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near[_FT].NEAR_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (_near2.length > 0) {
+                                    for (var _FT = 0; _FT < _near2.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near2[_FT].LOCAL_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!dislike) {
+                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
+                                    FTRegisterDate[j].STATUS = 1;
+                                    DayLength2--;
+                                }
 
                                 if (DayLength2 == 0) {
                                     SwSn++;
@@ -1609,30 +2293,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     }
                 }
 
-                if (DayLength2 > 0) {
-                    for (var FTIndex = 0; FTIndex < $scope.RegisterShopAmount.length; FTIndex++) {
-                        var FTRegistered = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
-                        var FTMenuFood = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
-                        if (FTMenuFood != null && FTMenuFood.length > 0 && FTMenuFood[0].ITEM_TYPE_ID != 1 && FTMenuFood[0].ITEM_TYPE_ID != 4) {
-                            var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
-                            for (var j = 0; j < FTRegisterDate.length; j++) {
-                                var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                if (FTR == null || FTR.length == 0) {
-                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                    FTRegisterDate[j].STATUS = 1;
-                                    DayLength2--;
-
-                                    if (DayLength2 == 0) {
-                                        SwSn++;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (DayLength2 == 0)
-                                break;
-                        }
-                    }
-                }
+                if (SwSn > shopInBlock.length / 2)
+                    break;
             }
 
             if (SwSn > shopInBlock.length / 2)
@@ -1658,43 +2320,191 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                         for (var j = 0; j < FTRegisterDate.length; j++) {
                             var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
                             if (FTR == null || FTR.length == 0) {
-                                FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                FTRegisterDate[j].STATUS = 1;
-                                DayLength2--;
+                                var FTDislike = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var FTDislikeStyle = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
+                                var _near = $filter('filter')($scope.NearList, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var _near2 = $filter('filter')($scope.NearList, { 'NEAR_ID': shopInBlock[i].LOCAL_ID }, true);
+                                var dislike = false;
 
-                                if (DayLength2 == 0) {
-                                    break;
+                                if (_near.length > 0) {
+                                    for (var _FT = 0; _FT < _near.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near[_FT].NEAR_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (_near2.length > 0) {
+                                    for (var _FT = 0; _FT < _near2.length; _FT++) {
+                                        var _nearFT = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': _near2[_FT].LOCAL_ID, 'START_DATE': FTRegisterDate[j].START_DATE }, true);
+                                        if (_nearFT != null && _nearFT.length != 0) {
+                                            for (var nId = 0; nId < _nearFT.length; nId++) {
+                                                var FTMenuFood2 = $filter('filter')($scope.ShopMenu, { 'MAIN_ITEM': true, 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislike2 = $filter('filter')($scope.ShopDislikeMenu, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+                                                var FTDislikeStyle2 = $filter('filter')($scope.ShopDislikeStyle, { 'SHOP_ID': _nearFT[nId].SHOP_ID }, true);
+
+                                                if (FTDislike.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_MENU_ID == FTDislike[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislike2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislike2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_MENU_ID == FTDislike2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood2.length; fId++) {
+                                                            if (FTMenuFood2[fId].ITEM_STYLE_ID == FTDislikeStyle[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+
+                                                if (FTDislikeStyle2.length > 0) {
+                                                    for (var dId = 0; dId < FTDislikeStyle2.length; dId++) {
+                                                        for (var fId = 0; fId < FTMenuFood.length; fId++) {
+                                                            if (FTMenuFood[fId].ITEM_STYLE_ID == FTDislikeStyle2[dId].ITEM_STYLE_ID) {
+                                                                console.log($scope.RegisterShopAmount[FTIndex].SHOP_ID + 'Dislike Near' + _nearFT[nId].SHOP_ID)
+                                                                dislike = true;
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (dislike)
+                                                            break;
+                                                    }
+                                                }
+
+                                                if (dislike)
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!dislike) {
+                                    FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
+                                    FTRegisterDate[j].STATUS = 1;
+                                    DayLength2--;
                                 }
                             }
                         }
                         if (DayLength2 == 0)
                             break;
-                    }
-                }
-
-                if (DayLength2 > 0) {
-                    for (var FTIndex = 0; FTIndex < $scope.RegisterShopAmount.length; FTIndex++) {
-                        var FTMenuFood = $filter('filter')($scope.ShopMenu, { 'ITEM_TYPE_ID': 1, 'MAIN_ITEM': true, 'SHOP_ID': $scope.RegisterShopAmount[FTIndex].SHOP_ID }, true);
-                        if (FTMenuFood != null && FTMenuFood.length > 0) {
-                            var FTRegistered = $filter('filter')($scope.RegisterShop, { 'LOCAL_ID': shopInBlock[i].LOCAL_ID }, true);
-                            var FTRegisterDate = $filter('filter')($scope.RegisterShop, { 'SHOP_ID': FTMenuFood[0].SHOP_ID, 'STATUS': 0 }, true);
-                            if (FTRegisterDate.length >= DayLength2) {
-                                for (var j = 0; j < FTRegisterDate.length; j++) {
-                                    var FTR = $filter('filter')(FTRegistered, { 'START_DATE': FTRegisterDate[j].START_DATE }, true);
-                                    if (FTR == null || FTR.length == 0) {
-                                        FTRegisterDate[j].LOCAL_ID = shopInBlock[i].LOCAL_ID;
-                                        FTRegisterDate[j].STATUS = 1;
-                                        DayLength2--;
-
-                                        if (DayLength2 == 0)
-                                            break;
-                                    }
-                                }
-
-                                if (DayLength2 == 0)
-                                    break;
-                            }
-                        }
                     }
                 }
             }
@@ -1727,4 +2537,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         }
         return grid;
     };
+
+    $scope.submitSchedule = function () {
+
+    }
 })
