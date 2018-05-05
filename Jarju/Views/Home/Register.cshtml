@@ -1,22 +1,16 @@
 ﻿
 @{
-    ViewBag.Title = "Customer information";
+    ViewBag.Title = "เพิ่มผู้เข้าใช้งานระบบ";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="CreateEventController" style="width:100%;height:75vh;">
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="AddUserController" ng-cloak>
     <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 100%; font-size: 10pt">
         <div class="row hdBar">
-            <div class="col-sm-7"><h4>Create Event</h4></div>
+            <div class="col-sm-7"><h4>Register</h4></div>
             <div class="col-sm-5" style="margin-top:6px;text-align:right;">
                 <button type="button" class="btn btn-primary" ng-click="submitEvent()">
                     <span class="glyphicon glyphicon-floppy-save"></span> Save
-                </button>
-                <button type="button" class="btn btn-primary" ng-click="editEventPlan()" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0">
-                    <span class="glyphicon glyphicon-tent"></span> Event Floor Plan
-                </button>
-                <button type="button" class="btn btn-primary" ng-click="DepositStatus()" ng-show="formData.Event.EVENT_ID != null && formData.Event.EVENT_ID != 0 && formData.DepositList != null">
-                    <span class="glyphicon"></span> Deposit status
                 </button>
             </div>
         </div>
@@ -119,47 +113,6 @@
                     </tbody>
                 </table>
 
-            </div>
-        </div>
-    </div>
-    <div id="DepositModal" class="w3-modal w3-display-topmiddle" style="width:100%;overflow:hidden">
-        <header class="w3-container" style="background-color:#16B343">
-            <span onclick="document.getElementById('DepositModal').style.display = 'none'"
-                  class="w3-closebtn">&times;</span>
-            <h2 class="w3-text-shadow ievoFont"></h2>
-        </header>
-        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
-            <div id="detail" class="sm-table-container">
-                <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
-                    <thead>
-                        <tr class="sm-table-header">
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="sm-table-row"
-                            ng-repeat="row in formData.DepositList track by $index">
-                            <td class="tblDetail">
-                                <div>
-                                    Shop : {{ row.SHOP_NAME}}
-                                </div>
-                                <div>
-                                    Status : {{ checkDepositStatus(row.STATUS)}}
-                                </div>
-                            </td>
-                            <td class="tblDetail" ng-show="row.STATUS == 3"> 
-                                <div>
-                                    <a>
-                                        Slip
-                                        <div style="width:250px;"><img src="{{row.SLIP_PATH}}" style="width:250px;" /></div>
-                                    </a>
-                                    <button type="button" class="btn btn-primary" ng-click="ConfirmDeposit(row)">
-                                        <span class="glyphicon glyphicon-tent"></span> Confirm
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

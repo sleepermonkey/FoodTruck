@@ -7,12 +7,9 @@
     <div class="container" style="width:100%;">
         <div class="row" ng-repeat="events in ListEvent" style="display: flex;align-items: center;justify-content: center;">
             <div class="col-sm-3 eventBox" ng-repeat="event in events" ng-click="openEvent(event.EVENT_ID)">
-                <div>
-                    <img ng-src="{{event.COVER_PATH}}" style="position: absolute;max-width: 100%;max-height: 100%;" />
-                </div>
-                <div style="margin-top:180px">
-                    {{event.EVENT_ID}}
-                    {{event.COVER_PATH}}
+                <img ng-src="{{event.COVER_PATH}}" style="position: absolute;width:100%;max-height:100%;border-radius:25px;" />
+                <div style="margin-top:180px;">
+                    {{event.EVENT_NAME}}
                 </div>
                 
             </div>
@@ -30,15 +27,93 @@
             </div>
             <div id="EditItem" class="row">
                 <form name="dealerConf">
-                    <div class="row custom-row">
-                        <img ng-src="{{formData.EventDetail.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
-                    </div>
-                    <div class="row custom-row">
-                        <div class="col-md-12">
-                            {{formData.EventDetail.DESCRIPTION}}
+                    <div class="col-md-6">
+                        <div class="row custom-row" align="center">
+                            <img ng-src="{{formData.EventDetail.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
+                        </div>
+                        <div class="row custom-row">
+                            <div class="col-md-3">
+                                รายละเอียด :
+                            </div>
+                            <div class="col-md-8">
+                                <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.EventDetail.DESCRIPTION" ng-disabled="true"></textarea>
+                            </div>
+                        </div>
+                        <div class="row custom-row">
+                            <div class="col-md-3">
+                                สถานที่ :
+                            </div>
+                            <div class="col-md-8">
+                                <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.EventDetail.EVENT_PLACE" ng-disabled="true"></textarea>
+                            </div>
                         </div>
                     </div>
-                    <br>
+                    <div class="col-md-6">
+                        @if (HttpContext.Current.Session["ssUserID"] != null)
+    {
+                    <div class="row custom-row">
+                        <div class="col-md-3">
+                            คะแนน :
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" ng-model="Rate" convert-to-number style="width:75%">
+                                <option value="1">
+                                    1
+                                </option>
+                                <option value="2">
+                                    2
+                                </option>
+                                <option value="3">
+                                    3
+                                </option>
+                                <option value="4">
+                                    4
+                                </option>
+                                <option value="5">
+                                    5
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-5" align="right">
+                            <button type="button" class="btn btn-primary" ng-click="submitReview()">
+                                <span class="glyphicon glyphicon-floppy-save"></span> Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-3">
+                            ความคิดเห็น :
+                        </div>
+                        <div class="col-md-8">
+                            <textarea class="form-control" rows="3" placeholder="Event place" ng-model="Review"></textarea>
+                        </div>
+                    </div>
+}
+                        <br>
+                        <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                            <thead>
+                                <tr class="sm-table-header">
+                                    <th class="tblHeader">
+                                        Customer Review
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="sm-table-row"
+                                    ng-repeat="row in ReviewList track by $index">
+                                    <td class="tblDetail">
+                                        <div style="font-style:oblique">
+                                            {{row.NAME}} :
+                                        </div>
+                                        <div style="height:3px;"></div>
+                                        <div>
+                                            {{row.REVIEW}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </form>
             </div>
         </div>

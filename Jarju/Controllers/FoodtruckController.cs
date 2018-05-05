@@ -22,6 +22,12 @@ namespace Jarju.Controllers
             return View();
         }
 
+        public ActionResult FoodtruckList()
+        {
+            ViewBag.PageTitle = "Foodtruck List";
+            return View();
+        }
+
         public ActionResult EventRegisterView()
         {
             ViewBag.PageTitle = "Event Register";

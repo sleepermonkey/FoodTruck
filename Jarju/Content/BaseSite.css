@@ -1195,3 +1195,12 @@ a.pointer-link {
     display: inline-block;
     padding-left: 0px;
 }
+
+a > div {
+    display: none;
+}
+
+a:hover > div {
+    display: block;
+
+}

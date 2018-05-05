@@ -15,18 +15,18 @@
     <div id="main" class="container" style="border-left:1px solid #cecece; border-right:1px solid #cecece; min-height: 100%;">
 
         <div id="HeaderSection" class="row" style="margin-bottom:0px">
-            <div id="LogoSection" class="col-md-2" style="margin:0px;background-color:#13d34a;">
-                <!--<div style="text-align:center">
-                    <a href="@Url.Action("Main", "System")">
-                        <img src="~/Content/img/logo.png" height="100" alt="จ่าจู แคทเทอริ่ง" />
+            <div id="LogoSection" class="col-md-2" style="margin:0px;background-color:#13d34a;height:58px">
+                <div style="text-align:center">
+                    <a href="@Url.Action("Index", "Home")">
+                        <img src="~/Content/img/logo.png" height="58" alt="จ่าจู แคทเทอริ่ง"/>
                     </a>
-                </div>-->
+                </div>
             </div>
-            <div id="SystemSection" class="col-md-10" style="margin:0px">
-                <div class="row" style="background-color:#13D34A;color:#ffffff;">
+            <div id="SystemSection" class="col-md-10" style="margin:0px;height:58px;">
+                <div class="row" style="background-color:#13D34A;color:#ffffff;height:58px;">
                     <div class="col-md-7">
                         <!--<h2> JARJU </h2>-->
-                        <h2> Food Truck Event </h2>
+                        <h2> Food Truck Event System</h2>
                     </div>
                     <div class="col-md-5 navbar-collapse collapse" style="float:right;">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
@@ -48,7 +48,7 @@
                 </div>
             </div>
         </div>
-        <div class="row" style="margin-top:0px;background-color:#4CAF50">
+        <div class="row" style="margin-top:0px;background-color:#4CAF50;">
             <div class="dropdown">
                 <button class="dropbtn">
                     Event

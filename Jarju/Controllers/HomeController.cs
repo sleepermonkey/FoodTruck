@@ -40,7 +40,12 @@ namespace Jarju.Controllers
         {
             return View();
         }
-        
+
+        public ActionResult Register()
+        {
+            return View();
+        }
+
         public JsonResult GetRetailSalesMonth()
         {
             DataTable dt = new DataTable();

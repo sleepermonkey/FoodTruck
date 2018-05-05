@@ -1,4 +1,4 @@
-﻿app.controller﻿("FoodTruckProfileController", function ($scope, $http, BaseService, FT_PATH, MENU_PATH, SYSTEM_PATH, $timeout, $filter) {
+﻿app.controller﻿("FoodTruckProfileController", function ($scope, $http, BaseService, FT_PATH, MENU_PATH, SYSTEM_PATH, $timeout, $filter, Upload) {
 
     Opening();
 
@@ -214,6 +214,12 @@
         document.getElementById('DetailModal').style.display = 'block';
     }
 
+    $scope.payDeposit = function (_event) {
+        document.getElementById('DepositModal').style.display = 'block';
+        $scope.Deposit = _event.DEPOSIT;
+        $scope.DepositEvent = _event.EVENT_ID;
+    }
+
     $scope.submitMenu = function () {
         let scopeData = $scope.newMenu;
         let data = $.param(scopeData)
@@ -278,6 +284,43 @@
                     });
             });
     }
+
+    $scope.submitDeposit = function () {
+        UploadDepositSlip();
+    }
+
+    function UploadDepositSlip() {
+
+        var file = $scope.fileUpload;
+
+        $scope.fileName = file.name;
+        $scope.ListDetail = null;
+
+        file.upload = Upload.upload({
+            url: window.location.origin + FT_PATH + '/UploadDepositSlip',
+            data: { File: file, ID: $scope.DepositEvent },
+        });
+
+        file.upload.then(function (res) {
+            $timeout(function () {
+                if (res.data.result == 500) {
+                    BaseService.Message.alert("Please insert file.");
+                } else if (res.data.result == 200) {
+                    BaseService.Message.alert((res.data.data));
+                } else {
+                    BaseService.Message.alert("บันทึกข้อมูลสำเร็จ");
+                    document.getElementById('DepositModal').style.display = 'none';
+                }
+            })
+        }, function (res) {
+            if (res.status > 0) {
+                $scope.errorMsg = res.status + ': ' + res.data;
+                BaseService.Message.alert("Cannot upload file")
+            }
+        }, function (evt) {
+            file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+        });
+    };
 })
 
 app.controller﻿("EventRegisterViewController", function ($scope, $http, BaseService, EVENT_PATH, Upload, $timeout) {

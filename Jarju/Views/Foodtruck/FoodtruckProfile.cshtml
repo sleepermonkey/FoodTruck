@@ -35,7 +35,7 @@
                 </div>
                 <br>
                 <hr />
-                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2" ng-show="formData.Invited.length > 0">
                     <thead>
                         <tr class="sm-table-header">
                             <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
@@ -51,7 +51,7 @@
                                 <div>
                                     <a class="sm-btn-view glyphicon glyphicon-envelope" ng-click="acceptInvited(row.EVENT_ID)">
                                     </a>
-                                    <a class="sm-btn-view glyphicon glyphicon-remove" ng-click="declineInvited(row.EVENT_ID)">
+                                    <a class="sm-btn-view glyphicon glyphicon-trash" ng-click="declineInvited(row.EVENT_ID)">
                                     </a>
                                     <a href="/Event/ViewEvent/{{row['EVENT_ID']}}">{{row.EVENT_NAME}}</a>
                                 </div>
@@ -78,6 +78,9 @@
                                 <div>
                                     From : <a href="#">{{row.START_DATE}}</a>
                                     To : <a href="#">{{row.END_DATE}}</a>
+                                </div>
+                                <div ng-show="row['STATUS'] == 1">
+                                    <a class="sm-btn-view glyphicon glyphicon-barcode" ng-click="payDeposit(row)">pay deposit</a>
                                 </div>
                             </td>
                         </tr>
@@ -243,7 +246,7 @@
         <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
             <div class="col-sm-12 hdBar">
                 <div class="col-sm-9"><h4>Add Menu</h4></div>
-                
+
             </div>
             <div id="EditItem" class="row">
                 <div id="CustomerInfo" class="col-sm-4">
@@ -276,6 +279,64 @@
                     <div class="row custom-row">
                         <div class="col-sm-3" style="margin-top:6px;text-align:right;">
                             <button type="button" class="btn btn-primary" ng-click="submitMenu()">
+                                <span class="glyphicon glyphicon-floppy-save"></span> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="DepositModal" class="w3-modal w3-display-topmiddle" style="width:100%;">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DepositModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+            <div class="col-sm-12 hdBar">
+                <div class="col-sm-9"><h4>Pay Deposit</h4></div>
+
+            </div>
+            <div id="EditItem" class="row">
+                <div id="CustomerInfo" class="col-sm-4">
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Value :
+                        </div>
+                        <div class="col-md-5">
+                            {{Deposit}} Baht
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Bank
+                        </div>
+                        <div class="col-md-5">
+                            KBank xxxxxxxxx
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-md-4">
+                            Payment slip :
+                        </div>
+                        <div class="col-md-4" align="right">
+                            <label class="btn btn-success btn-file">
+                                <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
+                                Browse<input type="file"
+                                             ngf-select=""
+                                             ngf-pattern="'.png,jpg,jpeg'"
+                                             accept=".png,jpg,jpeg"
+                                             ng-model="fileUpload" />
+                            </label>
+                        </div>
+                        <div class="col-md-4" style="font-size:medium;">
+                            {{fileUpload.name}}
+                        </div>
+                    </div>
+                    <div class="row custom-row">
+                        <div class="col-sm-3" style="margin-top:6px;text-align:right;">
+                            <button type="button" class="btn btn-primary" ng-click="submitDeposit()">
                                 <span class="glyphicon glyphicon-floppy-save"></span> Save
                             </button>
                         </div>

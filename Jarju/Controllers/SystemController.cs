@@ -109,12 +109,20 @@ namespace Jarju.Controllers
                 Session.Add(Cons.SS_USER_ROLE, '2');
                 Session.Add(Cons.SS_SHOP_ID, user.Replace("ft", ""));
             }
+            else if(user.Contains("cu"))
+            {
+                Session.Add(Cons.SS_USER_ID, user.Replace("cu", ""));
+                Session.Add(Cons.SS_USER_ROLE, '3');
+            }
             
             Session.Add(Cons.SS_USER_NAME, usrname);
             Session.Add(Cons.SS_USER_LAST_NAME, '1');
             Session.Add(Cons.SS_USER_LANG, '1');
 
-            return RedirectToAction("Index", "Home");
+            if(user.Contains("ft"))
+                return RedirectToAction("FoodtruckProfile", "Foodtruck");
+            else
+                return RedirectToAction("Index", "Home");
             //    }
 
             //}

@@ -172,7 +172,7 @@
                 </div>
             </div>
             <hr />
-            <div class="row custom-row">
+            <div class="row custom-row" ng-hide="planMode != 1">
                 <div class="col-md-5">
                     Food Truck :
                 </div>
@@ -182,7 +182,7 @@
                     </select>
                 </div>
             </div>
-            <div class="row custom-row" align="right">
+            <div class="row custom-row" align="right" ng-hide="planMode != 1">
                 <div class="col-md-12">
                     <label class="btn btn-success btn-file" ng-click="inviteFoodTruck()">
                         <span class="glyphicon glyphicon-envelope"></span>&nbsp;

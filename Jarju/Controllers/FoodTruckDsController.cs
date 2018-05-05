@@ -291,5 +291,40 @@ namespace FoodTruck.Controllers
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public JsonResult UploadDepositSlip(HttpPostedFileBase File, string ID)
+        {
+            if(Session[Cons.SS_SHOP_ID] == null || Session[Cons.SS_SHOP_ID].ToString() == "0")
+            {
+                return Json(new { result = 500 });
+            }
+
+            if (File != null && File.ContentLength > 0)
+            {
+                // Write file to Server
+                string gFileName = File.FileName;
+                string uploadLocationStr = "/Upload/Event/Slip/" + ID + "/" + Session[Cons.SS_SHOP_ID].ToString() + "/";
+                string uploadLocation = Server.MapPath(uploadLocationStr);
+                string fileLocation = uploadLocationStr + gFileName;
+
+                DataService.UploadFileByLocation(File
+                                                , uploadLocation
+                                                , Server.MapPath(fileLocation));
+
+                gSQL = String.Format("EXEC [sp_Event_Slip_Upload] '{0}','{1}','{2}'"
+                                    , ID
+                                    , Session[Cons.SS_SHOP_ID].ToString()
+                                    , fileLocation);
+                DataTable dt = odb.SqlQuery(gSQL, mDBName);
+
+                return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+
+            }
+            else
+            {
+                return Json(new { result = 500 });
+            }
+        }
     }
 }

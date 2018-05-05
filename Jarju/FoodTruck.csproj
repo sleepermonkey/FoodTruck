@@ -191,6 +191,7 @@
   <ItemGroup>
     <Content Include="AngApp\AppFoodTruck.js" />
     <Content Include="AngApp\FactoryServices.js" />
+    <Content Include="AngApp\jUser.js" />
     <Content Include="AngApp\jMenu.js" />
     <Content Include="AngApp\jFoodtruck.js" />
     <Content Include="AngApp\jEvent.js" />
@@ -1361,6 +1362,7 @@
     <Content Include="Views\Foodtruck\EventRegisterView.cshtml" />
     <Content Include="Views\Foodtruck\RegisterEvent.cshtml" />
     <Content Include="Views\Event\ViewEvent.cshtml" />
+    <Content Include="Views\Home\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

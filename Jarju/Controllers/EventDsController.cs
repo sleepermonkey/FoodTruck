@@ -29,6 +29,18 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetSummaryEventReview()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [sp_Event_Review_Summary] {0}";
+            gSQL = String.Format(gSQL,
+                        Request.Form["ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetEvent()
         {
             DataTable dt = new DataTable();
@@ -40,6 +52,35 @@ namespace FoodTruck.Controllers
                              Session[Cons.SS_EVENT_ID].ToString());
                 dt = odb.SqlQuery(gSQL, mDBName);
             }
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetDepositList()
+        {
+            DataTable dt = new DataTable();
+
+            if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
+            {
+                gSQL = "EXEC [sp_Event_Deposit_list] {0}";
+                gSQL = String.Format(gSQL,
+                             Session[Cons.SS_EVENT_ID].ToString());
+                dt = odb.SqlQuery(gSQL, mDBName);
+            }
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult ConfirmDeposit()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [sp_Event_Deposit_Confirm] '{0}','{1}'";
+            gSQL = String.Format(gSQL,
+                        Request.Form["SHOP_ID"].ToString(),
+                        Request.Form["EVENT_ID"].ToString());
+            dt = odb.SqlQuery(gSQL, mDBName);
+            
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
@@ -86,6 +127,21 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult SubmitReview()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [sp_Event_Review_Submit] '{0}','{1}','{2}','{3}'";
+            gSQL = String.Format(gSQL,
+                        Request.Form["ID"],
+                        Session[Cons.SS_USER_ID].ToString(),
+                        Request.Form["RATE"],
+                        Request.Form["REVIEW"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetPlanShop()
         {
             DataTable dt = new DataTable();
@@ -112,6 +168,19 @@ namespace FoodTruck.Controllers
                                 , Request.Form["WIDTH"]
                                 , Request.Form["DEPTH"]
                                 , Request.Form["GRID_SIZE"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult CheckInviteFoodTruck()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Event_Check_Invite] '{0}','{1}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["LOCAL_ID"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
@@ -200,6 +269,22 @@ namespace FoodTruck.Controllers
             DataTable dt = new DataTable();
             gSQL = "EXEC [sp_Dislike_Menu_Style_List] '{0}'";
             gSQL = String.Format(gSQL, Request.Form["SHOP_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SubmitSchedule()
+        {
+            DataTable dt = new DataTable();
+            gSQL = "EXEC [sp_Event_Schedule_Update] '{0}','{1}','{2}','{3}','{4}'";
+
+            gSQL = String.Format(gSQL,
+                            Request.Form["EVENT_ID"].ToString(),
+                            Request.Form["SHOP_ID"].ToString(),
+                            Request.Form["START_DATE"].ToString(),
+                            Request.Form["LOCAL_ID"].ToString(),
+                            Request.Form["STATUS"].ToString());
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
