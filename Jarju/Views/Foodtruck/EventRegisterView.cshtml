@@ -7,14 +7,10 @@
     <div class="container" style="width:100%;">
         <div class="row" ng-repeat="events in ListEvent" style="display: flex;align-items: center;justify-content: center;">
             <div class="col-sm-3 eventBox" ng-repeat="event in events" ng-click="openEvent(event.EVENT_ID)">
-                <div>
-                    <img ng-src="{{event.COVER_PATH}}" style="position: absolute;max-width: 100%;max-height: 100%;" />
+                <img ng-src="{{event.COVER_PATH}}" style="position: absolute;width:100%;max-height:100%;border-radius:25px;" />
+                <div style="margin-top:180px;">
+                    {{event.EVENT_NAME}}
                 </div>
-                <div style="margin-top:180px">
-                    {{event.EVENT_ID}}
-                    {{event.COVER_PATH}}
-                </div>
-                
             </div>
         </div>
     </div>
@@ -35,15 +31,25 @@
             </div>
             <div id="EditItem" class="row">
                 <form name="dealerConf">
-                    <div class="row custom-row">
+                    <div class="row custom-row" align="center">
                         <img ng-src="{{formData.EventDetail.COVER_PATH}}" style="max-width: 100%;max-height: 100%;" />
                     </div>
                     <div class="row custom-row">
-                        <div class="col-md-12">
-                            {{formData.EventDetail.DESCRIPTION}}
+                        <div class="col-md-3">
+                            รายละเอียด :
+                        </div>
+                        <div class="col-md-8">
+                            <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.EventDetail.DESCRIPTION" ng-disabled="true"></textarea>
                         </div>
                     </div>
-                    <br>
+                    <div class="row custom-row">
+                        <div class="col-md-3">
+                            สถานที่ :
+                        </div>
+                        <div class="col-md-8">
+                            <textarea class="form-control" rows="3" placeholder="Event place" ng-model="formData.EventDetail.EVENT_PLACE" ng-disabled="true"></textarea>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

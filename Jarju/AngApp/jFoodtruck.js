@@ -7,6 +7,7 @@
 
         $scope.OwnMenuHeader = {};
         $scope.OwnMenuList = [];
+        $scope.OldMenuName = "";
         $scope.newMenu = {};
         $scope.newMenu.NAME = '';
         $scope.newMenu.MAIN_ITEM = false; 
@@ -45,7 +46,6 @@
         BaseService.GetDataTable(FT_PATH, "GetDislikeMenuStyleList")
             .then(function (result) {
                 $scope.DislikeMenuStyleList = result;
-                console.log($scope.DislikeMenuStyleList);
             }, function (error) {
                 console.log('Unable to load menu type data: ' + error.message)
             })
@@ -69,7 +69,6 @@
     function GetData() {
         BaseService.GetDataTable(FT_PATH, "GetFoodtruckProfile")
             .then(function (result) {
-                console.log(result);
                 $scope.formData.foodtruck = result[0];
             }, function (error) {
                 console.log('Unable to load event data: ' + error.message)
@@ -77,7 +76,6 @@
 
         BaseService.GetDataTable(FT_PATH, "GetInvited")
             .then(function (result) {
-                console.log(result);
                 $scope.formData.Invited = result;
             }, function (error) {
                 console.log('Unable to load event data: ' + error.message)
@@ -85,7 +83,6 @@
 
         BaseService.GetDataTable(FT_PATH, "GetNextEvent")
             .then(function (result) {
-                console.log(result);
                 $scope.formData.NextEvent = result;
             }, function (error) {
                 console.log('Unable to load event data: ' + error.message)
@@ -212,6 +209,15 @@
 
     $scope.AddNewMenuView = function () {
         document.getElementById('DetailModal').style.display = 'block';
+        $scope.OldMenuName = "";
+    }
+
+    $scope.ShowMenu = function (_Menu) {
+        document.getElementById('DetailModal').style.display = 'block';
+        $scope.newMenu.ITEM_MENU_ID = _Menu.ITEM_MENU_ID;
+        $scope.OldMenuName = _Menu.NAME;
+        $scope.newMenu.NAME = _Menu.NAME;
+        $scope.newMenu.MAIN_ITEM = _Menu.MAIN_ITEM;
     }
 
     $scope.payDeposit = function (_event) {
@@ -221,6 +227,7 @@
     }
 
     $scope.submitMenu = function () {
+        $scope.newMenu.OLD_NAME = $scope.OldMenuName;
         let scopeData = $scope.newMenu;
         let data = $.param(scopeData)
         BaseService.CallAction(FT_PATH, "SubmitNewMenu", data)
@@ -513,12 +520,12 @@ app.controller﻿("RegisterEventController", function ($scope, $http, BaseServic
                 var StartDate = new Date($scope.formData.Event.START_DATE);
                 var timeDiff = Math.abs(EndDate.getTime() - StartDate.getTime());
                 var DayLength = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-                if (DayLength <= 7) {
+                if (DayLength <= 4) {
                     $scope.TableWidth = 150 * DayLength;
                     $scope.TableHeight = 150;
                 } else {
-                    $scope.TableWidth = 150 * DayLength;
-                    $scope.TableHeight = 150 * (($scope.DayLength / 7) + 1);
+                    $scope.TableWidth = 150 * 4;
+                    $scope.TableHeight = 150 * (($scope.DayLength / 4) + 1);
                 }
                 for (var i = 0; i < DayLength; i++) {
                     var _date = new Date($scope.formData.Event.START_DATE);
@@ -528,6 +535,7 @@ app.controller﻿("RegisterEventController", function ($scope, $http, BaseServic
                         'SELECTED': false});
                 }
                 console.log($scope.EventDate);
+                $scope.EventDate2 = $scope.matrixList($scope.EventDate, 4);
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
@@ -543,19 +551,39 @@ app.controller﻿("RegisterEventController", function ($scope, $http, BaseServic
     }
 
     $scope.registerEvent = function () {
-        for (var i = 0; i < $scope.EventDate.length; i++) {
-            if (!$scope.EventDate[i].SELECTED)
-                continue;
+        let scopeData = $scope.EventDate[0];
+        let data = $.param(scopeData);
+        BaseService.CallAction(FT_PATH, "DeleteRegisterFoodtruck", data)
+            .then(function (result) {
+                for (var i = 0; i < $scope.EventDate.length; i++) {
+                    if (!$scope.EventDate[i].SELECTED)
+                        continue;
 
-            let scopeData = $scope.EventDate[i];
-            let data = $.param(scopeData);
-            BaseService.CallAction(FT_PATH, "RegisterFoodtruck", data)
-                .then(function (result) {
-                }, function (error) {
-                    BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
-                    console.log('Unable to edit event data: ' + error.message)
-                })
-        }
+                    let scopeData = $scope.EventDate[i];
+                    let data = $.param(scopeData);
+                    BaseService.CallAction(FT_PATH, "RegisterFoodtruck", data)
+                        .then(function (result) {
+                        }, function (error) {
+                            BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                            console.log('Unable to edit event data: ' + error.message)
+                        })
+                }
+            }, function (error) {
+                BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                console.log('Unable to edit event data: ' + error.message)
+            })
     }
+
+    $scope.matrixList = function (data, n) {
+        var grid = [], i = 0, x = data.length, col, row = -1;
+        for (var i = 0; i < x; i++) {
+            col = i % n;
+            if (col === 0) {
+                grid[++row] = [];
+            }
+            grid[row][col] = data[i];
+        }
+        return grid;
+    };
 })
 

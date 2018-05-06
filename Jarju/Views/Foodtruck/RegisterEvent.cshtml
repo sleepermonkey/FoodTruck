@@ -78,14 +78,14 @@
                 <table id="PlanGrid" border="1" class="theme-table"
                        style="position: relative;table-layout:fixed;width:{{TableWidth}}px;height:{{TableHeight}}px;">
                     <tbody>
-                        <tr style="width:150px;height:150px;">
-                            <td ng-repeat="_date in EventDate"
+                        <tr style="width:150px;height:150px;" ng-repeat="_date in EventDate2">
+                            <td ng-repeat="_date2 in _date"
                                 style="width:150px;height:150px;padding:3px;" valign="top">
                                 <div style="height:80%">
-                                    <p ng-bind="_date.ED | date:'dd/MM/yyyy'"></p>
+                                    <p ng-bind="_date2.ED | date:'dd/MM/yyyy'"></p>
                                 </div>
                                 <div style="height:20%">
-                                    <input type="checkbox" class="form-control" ng-model="_date.SELECTED" style="width:15px;height:15px;"
+                                    <input type="checkbox" class="form-control" ng-model="_date2.SELECTED" style="width:15px;height:15px;"
                                            ng-click="dateCheck()" />
                                 </div>
                             </td>

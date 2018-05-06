@@ -302,9 +302,28 @@ namespace FoodTruck.Controllers
                 SHOP_ID = "0";
             else
                 SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+            
+            gSQL = "EXEC [sp_Own_Menu_Submit] '{0}','{1}','{2}','{3}','{4}'";
+            gSQL = String.Format(gSQL, SHOP_ID, Request.Form["ITEM_MENU_ID"], Request.Form["NAME"], Request.Form["MAIN_ITEM"], Request.Form["OLD_NAME"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
 
-            gSQL = "EXEC [sp_Own_Menu_Submit] '{0}','{1}','{2}','{3}'";
-            gSQL = String.Format(gSQL, SHOP_ID, Request.Form["ITEM_MENU_ID"], Request.Form["NAME"], Request.Form["MAIN_ITEM"]);
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeleteRegisterFoodtruck()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+            gSQL = "DELETE FROM[dbo].[TBL_SHOP_AREA_CALENDAR] WHERE[EVENT_ID] = '{0}' AND[SHOP_ID] = '{1}' AND[STATUS] = 0";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = String.Format(gSQL,
+                            Session[Cons.SS_EVENT_ID].ToString(),
+                            SHOP_ID);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);

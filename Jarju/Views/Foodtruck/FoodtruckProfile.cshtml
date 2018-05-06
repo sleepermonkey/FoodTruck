@@ -129,12 +129,12 @@
                                 ng-show="Field.VISIBILITY==1"
                                 width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
                                 <div ng-if="Field.FIELD_NAME == 'EDIT'">
-                                    <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowItem_Click(row.ITEM_MENU_ID)">
+                                    <a class="sm-btn-view glyphicon glyphicon-pencil" href="#" ng-click="ShowMenu(row)">
                                     </a>
                                 </div>
                                 <div ng-if="Field.FIELD_NAME == 'MAIN_ITEM'">
                                     <input type="checkbox" class="form-control" ng-model="row.MAIN_ITEM" style="width:15px;height:15px;"
-                                           ng-click="itemStyleChecked(row)" />
+                                           ng-click="itemStyleChecked(row)" ng-disabled="true"/>
                                 </div>
                                 <div ng-if="Field.FIELD_NAME != 'EDIT' && Field.FIELD_NAME != 'MAIN_ITEM'">
                                     {{ row[Field.FIELD_NAME] }}
@@ -252,7 +252,7 @@
                 <div id="CustomerInfo" class="col-sm-4">
                     <div class="row custom-row">
                         <div class="col-md-3">
-                            Code :
+                            Menu :
                         </div>
                         <div class="col-md-5">
                             <select ng-model="newMenu.ITEM_MENU_ID" class="form-control" convert-to-number>
