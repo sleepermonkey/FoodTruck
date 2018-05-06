@@ -42,6 +42,45 @@ namespace FoodTruck.Controllers
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetSummaryFoodTruckReview()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Shop_Review_Summary] {0}";
+            gSQL = String.Format(gSQL,
+                        SHOP_ID);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SubmitReview()
+        {
+            DataTable dt = new DataTable();
+            string SHOP_ID = "";
+
+            if (Session[Cons.SS_SHOP_ID] == null)
+                SHOP_ID = "0";
+            else
+                SHOP_ID = Session[Cons.SS_SHOP_ID].ToString();
+
+            gSQL = "EXEC [sp_Shop_Review_Submit] '{0}','{1}','{2}','{3}'";
+            gSQL = String.Format(gSQL,
+                        SHOP_ID,
+                        Session[Cons.SS_USER_ID].ToString(),
+                        Request.Form["RATE"],
+                        Request.Form["REVIEW"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
         public JsonResult GetInvited()
         {
             DataTable dt = new DataTable();

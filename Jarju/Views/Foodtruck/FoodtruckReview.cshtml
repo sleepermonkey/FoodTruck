@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewBag.Title = "Customer information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="main" class="container" ng-app="FoodTruck_Module" ng-controller="FoodtruckReviewController" style="width:100%;height:100%;">
+    <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="font-size: 10pt">
+        <div class="row hdBar">
+            <div class="col-sm-9"><h4>{{formData.foodtruck.SHOP_NAME}}</h4></div>
+        </div>
+        <div id="EditItem" class="row">
+            <div class="col-sm-3" style="margin-top:10px;">
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center">
+                                Own Menu
+                            </th>
+                            <th colspan="2" valign="top" align="right" style="background-color:white;color:black;">
+                                <div align="right">
+                                    Filter :
+                                    <input type="text" class="form-control" name="STYLE_NAME"
+                                           ng-model="FILTER.NAME" placeholder="Style" style="width:100px;margin:2px;">
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader"
+                                ng-repeat="Field in OwnMenuHeader"
+                                ng-show="Field.VISIBILITY==1" ng-style="setRadiusCol(Field.FIELD_NAME)"
+                                valign="top" width="{{Field.WIDTH}}" align="center">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in OwnMenuList | orderBy:sortType:sortReverse
+                                | filter:{NAME : FILTER.NAME}">
+                            <td class="tblDetail"
+                                ng-repeat="Field in OwnMenuHeader"
+                                ng-show="Field.VISIBILITY==1"
+                                width="{{Field.WIDTH}}" align="{{Field.ALIGN}}">
+                                <div ng-if="Field.FIELD_NAME != 'EDIT' && Field.FIELD_NAME != 'MAIN_ITEM'">
+                                    {{ row[Field.FIELD_NAME] }}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3" style="margin-top:10px;">
+                <table class="AutoTable2" style="height:auto;" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader" style="border-top-left-radius:6px;border-top-right-radius:6px;"
+                                valign="top" align="center" colspan="3">
+                                Next Event
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody style="height:auto;">
+                        <tr class="sm-table-row"
+                            ng-repeat="row in formData.NextEvent | orderBy:sortType:sortReverse">
+                            <td class="tblDetail">
+                                <div>
+                                    <a href="/Event/ViewEvent/{{row['EVENT_ID']}}">{{row.EVENT_NAME}}</a>
+                                </div>
+                                <div>
+                                    From : <a href="#">{{row.START_DATE}}</a>
+                                    To : <a href="#">{{row.END_DATE}}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                @if (HttpContext.Current.Session["ssUserID"] != null)
+    {
+            <div class="row custom-row">
+                <div class="col-md-3">
+                    คะแนน :
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" ng-model="Rate" convert-to-number style="width:75%">
+                        <option value="1">
+                            1
+                        </option>
+                        <option value="2">
+                            2
+                        </option>
+                        <option value="3">
+                            3
+                        </option>
+                        <option value="4">
+                            4
+                        </option>
+                        <option value="5">
+                            5
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-5" align="right">
+                    <button type="button" class="btn btn-primary" ng-click="submitReview()">
+                        <span class="glyphicon glyphicon-floppy-save"></span> Save
+                    </button>
+                </div>
+            </div>
+            <div class="row custom-row">
+                <div class="col-md-3">
+                    ความคิดเห็น :
+                </div>
+                <div class="col-md-8">
+                    <textarea class="form-control" rows="3" placeholder="Event place" ng-model="Review"></textarea>
+                </div>
+            </div>
+}
+                <br>
+                
+                <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header">
+                            <th class="tblHeader">
+                                Customer Review &nbsp;&nbsp;&nbsp;&nbsp;Rate : {{SummaryRate}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="sm-table-row"
+                            ng-repeat="row in ReviewList track by $index">
+                            <td class="tblDetail">
+                                <div style="font-style:oblique">
+                                    {{row.NAME}} :
+                                </div>
+                                <div style="height:3px;"></div>
+                                <div>
+                                    {{row.REVIEW}}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="height:20px"></div>
+</div>

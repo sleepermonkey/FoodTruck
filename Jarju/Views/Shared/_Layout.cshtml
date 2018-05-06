@@ -18,7 +18,7 @@
             <div id="LogoSection" class="col-md-2" style="margin:0px;background-color:#13d34a;height:58px">
                 <div style="text-align:center">
                     <a href="@Url.Action("Index", "Home")">
-                        <img src="~/Content/img/logo.png" height="58" alt="จ่าจู แคทเทอริ่ง"/>
+                        <img src="~/Content/img/logo.png" height="58" alt="จ่าจู แคทเทอริ่ง" />
                     </a>
                 </div>
             </div>
@@ -31,11 +31,10 @@
                     <div class="col-md-5 navbar-collapse collapse" style="float:right;">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
                         {
-                        <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
-                            <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
-                            <a href="@Url.Action("Personal", "System")" style="font-size:9pt">@HttpContext.Current.Session["ssShopID"]</a> |
-                            <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
-                        </div>
+                            <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
+                                <a href="@Url.Action("Register", "Home")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
+                                <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
+                            </div>
                         }
                         else
                         {
@@ -208,6 +207,7 @@
     <script src="~/AngApp/jEvent.js"></script>
     <script src="~/AngApp/jFoodtruck.js"></script>
     <script src="~/AngApp/jMenu.js"></script>
+    <script src="~/AngApp/jUser.js"></script>
 
     <link href="~/bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.css" rel="stylesheet">
     <script src="~/bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.js"></script>

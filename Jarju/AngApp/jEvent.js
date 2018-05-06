@@ -10,6 +10,7 @@
         $scope.Review = "";
         $scope.Rate = 0;
         $scope.ReviewList = [];
+        $scope.SummaryRate = 0;
         GetData();
     }
 
@@ -51,6 +52,7 @@
         BaseService.CallAction(EVENT_PATH, "GetSummaryEventReview", data)
             .then(function (result) {
                 $scope.ReviewList = result;
+                $scope.SummaryRate = result[0].RATE;
                 console.log(result)
             }, function (error) {
                 console.log('Unable to load event data: ' + error.message)
@@ -81,6 +83,29 @@
             }, function (error) {
                 console.log('Unable to load menu type data: ' + error.message)
             })
+    }
+
+    $scope.openFoodTruck = function () {
+        var sendData = [{ "ID": $scope.SelectedEvent }];
+        var data = $.param(sendData[0]);
+        BaseService.CallAction(EVENT_PATH, "GetFoodTruckEventList", data)
+            .then(function (result) {
+                document.getElementById("DepositModal").style.display = "block";
+                $scope.formData.FoodTruckList = result
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+    }
+
+    $scope.checkDepositStatus = function (_status) {
+        if (_status == 1)
+            return 'Waiting for confirm';
+        else if (_status == 2)
+            return 'Invited';
+        else if (_status == 3)
+            return 'Confirmed, Waiting for checking';
+        else if (_status == 4)
+            return 'Confirmed';
     }
 })
 

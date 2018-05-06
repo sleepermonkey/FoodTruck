@@ -42,5 +42,12 @@ namespace Jarju.Controllers
             Session[Cons.SS_SHOP_ID] = x;
             return View();
         }
+
+        public ActionResult FoodtruckReview(string id)
+        {
+            ViewBag.PageTitle = "Foodtruck Profile";
+            Session[Cons.SS_SHOP_ID] = id;
+            return View();
+        }
     }
 }

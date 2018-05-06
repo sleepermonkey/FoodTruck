@@ -11,7 +11,7 @@
                 <div style="margin-top:180px;">
                     {{event.EVENT_NAME}}
                 </div>
-                
+
             </div>
         </div>
     </div>
@@ -23,7 +23,14 @@
         </header>
         <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
             <div class="col-sm-12 hdBar">
-                <h4>{{formData.EventDetail.EVENT_NAME}}</h4>
+                <div class="col-sm-4">
+                    <h4>{{formData.EventDetail.EVENT_NAME}}</h4>
+                </div>
+                <div class="col-sm-8">
+                    <button type="button" class="btn btn-primary" ng-click="openFoodTruck()">
+                        Food Truck in Event
+                    </button>
+                </div>
             </div>
             <div id="EditItem" class="row">
                 <form name="dealerConf">
@@ -50,51 +57,51 @@
                     </div>
                     <div class="col-md-6">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
-    {
-                    <div class="row custom-row">
-                        <div class="col-md-3">
-                            คะแนน :
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-control" ng-model="Rate" convert-to-number style="width:75%">
-                                <option value="1">
-                                    1
-                                </option>
-                                <option value="2">
-                                    2
-                                </option>
-                                <option value="3">
-                                    3
-                                </option>
-                                <option value="4">
-                                    4
-                                </option>
-                                <option value="5">
-                                    5
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-5" align="right">
-                            <button type="button" class="btn btn-primary" ng-click="submitReview()">
-                                <span class="glyphicon glyphicon-floppy-save"></span> Save
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row custom-row">
-                        <div class="col-md-3">
-                            ความคิดเห็น :
-                        </div>
-                        <div class="col-md-8">
-                            <textarea class="form-control" rows="3" placeholder="Event place" ng-model="Review"></textarea>
-                        </div>
-                    </div>
-}
+                        {
+                            <div class="row custom-row">
+                                <div class="col-md-3">
+                                    คะแนน :
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-control" ng-model="Rate" convert-to-number style="width:75%">
+                                        <option value="1">
+                                            1
+                                        </option>
+                                        <option value="2">
+                                            2
+                                        </option>
+                                        <option value="3">
+                                            3
+                                        </option>
+                                        <option value="4">
+                                            4
+                                        </option>
+                                        <option value="5">
+                                            5
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5" align="right">
+                                    <button type="button" class="btn btn-primary" ng-click="submitReview()">
+                                        <span class="glyphicon glyphicon-floppy-save"></span> Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row custom-row">
+                                <div class="col-md-3">
+                                    ความคิดเห็น :
+                                </div>
+                                <div class="col-md-8">
+                                    <textarea class="form-control" rows="3" placeholder="Event place" ng-model="Review"></textarea>
+                                </div>
+                            </div>
+                        }
                         <br>
                         <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
                             <thead>
                                 <tr class="sm-table-header">
                                     <th class="tblHeader">
-                                        Customer Review
+                                        Customer Review &nbsp;&nbsp;&nbsp;&nbsp;Rate : {{SummaryRate}}
                                     </th>
                                 </tr>
                             </thead>
@@ -115,6 +122,42 @@
                         </table>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div id="DepositModal" class="w3-modal w3-display-topmiddle" style="width:100%;overflow:hidden">
+        <header class="w3-container" style="background-color:#16B343">
+            <span onclick="document.getElementById('DepositModal').style.display = 'none'"
+                  class="w3-closebtn">&times;</span>
+            <h2 class="w3-text-shadow ievoFont"></h2>
+        </header>
+        <div id="EditMaster" class="col-sm-12 w3-white  w3-border w3-round w3-border-grey " style="height: 400px; font-size: 10pt">
+            <div id="detail" class="sm-table-container">
+                <table class="AutoTable" id="tblTrans" cellpadding="2" cellspacing="2">
+                    <thead>
+                        <tr class="sm-table-header"></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="sm-table-row"
+                            ng-repeat="row in formData.FoodTruckList track by $index">
+                            <td class="tblDetail">
+                                <div>
+                                    Shop : {{ row.SHOP_NAME}}
+                                </div>
+                                <div>
+                                    Status : {{ checkDepositStatus(row.STATUS)}}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="col-sm-8">
+                                    <a class="btn btn-primary" href="/Foodtruck/FoodtruckReview/{{row.SHOP_ID}}">
+                                        Review
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

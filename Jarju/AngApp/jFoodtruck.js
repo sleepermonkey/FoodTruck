@@ -323,6 +323,107 @@
     };
 })
 
+app.controller﻿("FoodtruckReviewController", function ($scope, $http, BaseService, FT_PATH, MENU_PATH, SYSTEM_PATH, $timeout, $filter, Upload) {
+
+    Opening();
+
+    function Opening() {
+        $scope.formData = {};
+
+        $scope.OwnMenuHeader = {};
+        $scope.OwnMenuList = [];
+
+        $scope.Review = "";
+        $scope.Rate = 0;
+        $scope.ReviewList = [];
+        $scope.SummaryRate = 0;
+        GetData();
+
+        BaseService.GetHeaderGridView("MenuList3")
+            .then(function (result) {
+                $scope.OwnMenuHeader = result;
+            }, function (error) {
+                console.log('Unable to load menu type header data: ' + error.message)
+            })
+
+        BaseService.GetDataTable(FT_PATH, "GetOwnMenuList")
+            .then(function (result) {
+                $scope.OwnMenuList = result;
+                console.log(result);
+            }, function (error) {
+                console.log('Unable to load menu type data: ' + error.message)
+            });
+
+        BaseService.CallAction(FT_PATH, "GetSummaryFoodTruckReview", "0")
+            .then(function (result) {
+                $scope.ReviewList = result;
+                $scope.SummaryRate = result[0].RATE;
+                console.log(result)
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+    }
+
+    function GetData() {
+        BaseService.GetDataTable(FT_PATH, "GetFoodtruckProfile")
+            .then(function (result) {
+                console.log(result);
+                $scope.formData.foodtruck = result[0];
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+
+        BaseService.GetDataTable(FT_PATH, "GetInvited")
+            .then(function (result) {
+                console.log(result);
+                $scope.formData.Invited = result;
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+
+        BaseService.GetDataTable(FT_PATH, "GetNextEvent")
+            .then(function (result) {
+                console.log(result);
+                $scope.formData.NextEvent = result;
+            }, function (error) {
+                console.log('Unable to load event data: ' + error.message)
+            })
+    }
+
+    $scope.OrderColumn = function (pColName) {
+        $scope.sortType = pColName;
+        $scope.sortReverse = !$scope.sortReverse;
+    };
+
+    $scope.setRadiusCol = function (field) {
+        if (field == 'NEXT' || field == 'ITEM_STYLE_NAME' || field == 'MAIN_ITEM') {
+            return { 'border-top-right-radius': "6px" };
+        }
+    }
+
+    $scope.submitReview = function () {
+
+        if ($scope.Rate == 0 || $scope.Review == "") {
+            BaseService.Message.alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            return;
+        }
+
+        var sendData = [{
+            "ID": $scope.SelectedEvent,
+            "RATE": $scope.Rate,
+            "REVIEW": $scope.Review
+        }];
+        var data = $.param(sendData[0]);
+
+        BaseService.CallAction(FT_PATH, "SubmitReview", data)
+            .then(function (result) {
+                BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
+            }, function (error) {
+                console.log('Unable to load menu type data: ' + error.message)
+            })
+    }
+})
+
 app.controller﻿("EventRegisterViewController", function ($scope, $http, BaseService, EVENT_PATH, Upload, $timeout) {
 
     Opening();
