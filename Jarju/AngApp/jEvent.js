@@ -409,6 +409,32 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     });
                 }
 
+                for (var i = 0; i < $scope.formData.ShopList.length; i++) {
+                    for (var j = 0; j < $scope.formData.ShopList.length; j++) {
+                        if ($scope.formData.ShopList[i].FT == $scope.formData.ShopList[j].FT) {
+                            $scope.formData.ShopList.splice(j, 1);
+                        }
+                    }
+                }
+
+                BaseService.CallAction(EVENT_PATH, "GetElement", null)
+                    .then(function (result) {
+                        var x = result;
+                        for (var i = 0; i < x.length; i++) {
+                            var _ftString = x[i].ELEMENT_POSITION;
+                            $scope.ObjectPosition.push({
+                                parent: parseInt(_ftString.split(",")[1]),
+                                index: parseInt(_ftString.split(",")[0]),
+                                ObjectType: x[i].ELEMENT_TYPE_ID,
+                                ObjectGroup: 0
+                            });
+                        }
+                        console.log($scope.ObjectPosition)
+                    }, function (error) {
+                        BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
+                        console.log('Unable to edit event data: ' + error.message)
+                    })
+
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
@@ -422,6 +448,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit event data: ' + error.message)
             })
+
+        
     }
 
     $scope.setObjectType = function (type) {
@@ -580,7 +608,7 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
     $scope.CheckActivePosition = function ($parentIndex, $index) {
         for (var i = 0; i < $scope.ObjectPosition.length; i++) {
             if ($scope.ObjectPosition[i].index == $index && $scope.ObjectPosition[i].parent == $parentIndex) {
-                return $scope.ObjectPosition[i].ObjectType;
+                return $scope.ObjectPosition[i].ObjectType.toString();
             }
         }
 
@@ -669,6 +697,21 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
         var FoodTruckNumber = groupingObject();
         var error = false;
+
+        if (FoodTruckNumber < $scope.formData.ShopList.length) {
+            for (var i = FoodTruckNumber; i < $scope.formData.ShopList.length; i++) {
+                scopeData = $scope.formData.ShopList[i];
+                console.log(scopeData)
+                data = $.param(scopeData);
+                BaseService.CallAction(EVENT_PATH, "DeletePlanShop", data)
+                    .then(function (result) {
+                    }, function (error) {
+                        error = true;
+                        console.log('Unable to edit plan shop data: ' + error.message)
+                    })
+            }
+        }
+
         for (var i = 1; i <= FoodTruckNumber; i++) {
             var _ft = $filter('filter')($scope.ObjectPosition, { 'ObjectGroup': i }, true)
             var _ftString = ''
@@ -716,6 +759,44 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                     console.log('Unable to edit plan shop data: ' + error.message)
                 })
         }
+
+
+        var _obj = $filter('filter')($scope.ObjectPosition, { 'ObjectType': 1 }, true)
+        for (var i = 0; i < _obj.length; i++) {
+            var x = {
+                'EVENT_ID': $scope.formData.Event.EVENT_ID,
+                'ELEMENT_POSITION': _obj[i].index + ',' + _obj[i].parent,
+                'ELEMENT_TYPE_ID': 1
+            };
+
+            scopeData = x;
+            data = $.param(scopeData);
+            BaseService.CallAction(EVENT_PATH, "SubmitElement", data)
+                .then(function (result) {
+                }, function (error) {
+                    error = true;
+                    console.log('Unable to edit plan shop data: ' + error.message)
+                })
+        }
+
+        _obj = $filter('filter')($scope.ObjectPosition, { 'ObjectType': 2 }, true)
+        for (var i = 0; i < _obj.length; i++) {
+            var x = {
+                'EVENT_ID': $scope.formData.Event.EVENT_ID,
+                'ELEMENT_POSITION': _obj[i].index + ',' + _obj[i].parent,
+                'ELEMENT_TYPE_ID': 2
+            };
+
+            scopeData = x;
+            data = $.param(scopeData);
+            BaseService.CallAction(EVENT_PATH, "SubmitElement", data)
+                .then(function (result) {
+                }, function (error) {
+                    error = true;
+                    console.log('Unable to edit plan shop data: ' + error.message)
+                })
+        }
+
         if (error)
             BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลจุดจอดได้');
 
@@ -724,7 +805,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
 
     function groupingObject() {
         angular.forEach($scope.ObjectPosition, function (item) { item.ObjectGroup = 0; });
-        var itemsSorted = $filter('orderBy')($scope.ObjectPosition, ['index', 'parent']);
+        var _obj = $filter('filter')($scope.ObjectPosition, { 'ObjectType': 0 }, true)
+        var itemsSorted = $filter('orderBy')(_obj, ['index', 'parent']);
         var FoodTruckNumber = 0;
         for (var i = 0; i < itemsSorted.length; i++) {
             var _ft = itemsSorted[i];
@@ -1247,8 +1329,10 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
                 $scope.TableHeight = 150 * DayLength;
             }
 
+            console.log('Start')
+            console.log($scope.RegisterShop)
             var shopSorted2 = $filter('orderBy')($scope.RegisterShop, 'LOCAL_ID', false);
-            $scope.FTRegister = $scope.matrixList($filter('filter')(shopSorted2, { 'STATUS': 1 }, true), DayLength);
+            $scope.FTRegister = $scope.matrixList(shopSorted2.filter(function (x) { return x.STATUS != 0 }), DayLength);
         }
     });
 
@@ -2654,6 +2738,8 @@ app.controller﻿("FloorPlanController", function ($scope, $http, BaseService, E
         }
 
         for (var i = 0; i < x; i++) {
+            if (data[i].STATUS == 0)
+                continue;
             var newdate = new Date(data[i].START_DATE);
             for (var j = 0; j < n; j++) {
                 if (newdate.getDate() == _day[j].getDate()) {

@@ -114,9 +114,14 @@ namespace FoodTruck.Controllers
                 eDate = ismoUtil.ConvertAngularDateTo120(eDate);
             }
 
+            if(Request.Form["EVENT_ID"] != null)
+            {
+                ID = Request.Form["EVENT_ID"].ToString();
+            }
+
             gSQL = "EXEC [dbo].[sp_Event_Submit] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
             gSQL = String.Format(gSQL
-                                , Request.Form["EVENT_ID"]
+                                , ID
                                 , Request.Form["EVENT_NAME"]
                                 , Request.Form["EVENT_PLACE"]
                                 , sDate
@@ -132,7 +137,7 @@ namespace FoodTruck.Controllers
             else
                 ID = Request.Form["EVENT_ID"];
 
-            gSQL = "EXEC [sp_Event_List] {0}";
+            gSQL = "EXEC [sp_Event_List] '{0}'";
             gSQL = String.Format(gSQL,ID);
             dt = odb.SqlQuery(gSQL, mDBName);
 
@@ -161,6 +166,22 @@ namespace FoodTruck.Controllers
             if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
             {
                 gSQL = "EXEC [sp_Plan_Shop] {0}";
+                gSQL = String.Format(gSQL,
+                             Session[Cons.SS_EVENT_ID].ToString());
+                dt = odb.SqlQuery(gSQL, mDBName);
+            }
+
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetElement()
+        {
+            DataTable dt = new DataTable();
+
+            if (Session[Cons.SS_EVENT_ID] != null && Session[Cons.SS_EVENT_ID].ToString() != "0")
+            {
+                gSQL = "EXEC [sp_Element] {0}";
                 gSQL = String.Format(gSQL,
                              Session[Cons.SS_EVENT_ID].ToString());
                 dt = odb.SqlQuery(gSQL, mDBName);
@@ -227,6 +248,38 @@ namespace FoodTruck.Controllers
                                 , Request.Form["DEPOSIT_FEE_RATE"]
                                 , Request.Form["FT"]
                                 , Request.Form["BLOCK_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeletePlanShop()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Plan_Shop_Delete] '{0}','{1}','{2}','{3}','{4}','{5}','{6}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["LOCAL_ID"]
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["NAME"]
+                                , Request.Form["PRICE"]
+                                , Request.Form["DEPOSIT_FEE_RATE"]
+                                , Request.Form["FT"]
+                                , Request.Form["BLOCK_ID"]);
+            dt = odb.SqlQuery(gSQL, mDBName);
+
+            return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SubmitElement()
+        {
+            DataTable dt = new DataTable();
+
+            gSQL = "EXEC [dbo].[sp_Element_Submit] '{0}','{1}','{2}'";
+            gSQL = String.Format(gSQL
+                                , Request.Form["EVENT_ID"]
+                                , Request.Form["ELEMENT_POSITION"]
+                                , Request.Form["ELEMENT_TYPE_ID"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);

@@ -1,4 +1,4 @@
-﻿app.controller﻿("UserProfileController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, Upload, $window, $timeout) {
+﻿app.controller﻿("UserProfileController", function ($scope, $http, BaseService, EVENT_PATH, SYSTEM_PATH, $window, $timeout) {
 
     Opening();
 
@@ -6,11 +6,19 @@
         $scope.formData = {};
         $scope.formData.User = {};
         $scope.formData.User.USER_ID = 0;
-        $scope.fileUpload = null;
+        $scope.formData.User.ROLE_ID = 3;
         $scope.Password = "";
+        
         BaseService.CallAction(SYSTEM_PATH, "GetUser", "0")
             .then(function (result) {
                 $scope.formData.User = result[0];
+                if (!$scope.formData.User) {
+                    $scope.formData.User = {};
+                    $scope.formData.User.USER_ID = 0;
+                    $scope.formData.User.ROLE_ID = 3;
+                }
+                console.log($scope.formData.User)
+                
             }, function (error) {
                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');
                 console.log('Unable to edit menu type data: ' + error.message)
@@ -34,6 +42,8 @@
             BaseService.Message.alert('กรุณาใส่รหัสผ่านให้ตรงกัน');
         } else if ($scope.formData.User.CITIZEN_ID.length != 13) {
             BaseService.Message.alert('กรุณาใส่หมายเลขบัตรประชาชนให้ถูกต้อง');
+        } else if ($scope.formData.User.ROLE_ID == 1 && (!$scope.formData.User.COMPANY_NAME || !$scope.formData.User.COMPANY_ID)) {
+            BaseService.Message.alert('กรุณาใส่ข้อมูลบริษัท');
         }
         else {
             if ($scope.Password != "")
@@ -52,6 +62,7 @@
                         BaseService.CallAction(SYSTEM_PATH, "SubmitUser", data)
                             .then(function (result) {
                                 $scope.formData.User = result;
+                                $window.location.href = '/';
                                 BaseService.Message.alert('บันทึกข้อมูลสำเร็จ');
                             }, function (error) {
                                 BaseService.Message.alert('ไม่สามารถบันทึกข้อมูลได้');

@@ -31,10 +31,11 @@
                     <div class="col-md-5 navbar-collapse collapse" style="float:right;">
                         @if (HttpContext.Current.Session["ssUserID"] != null)
                         {
-                            <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
-                                <a href="@Url.Action("Register", "Home")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
-                                <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
-                            </div>
+                        <div style="font-size:9pt;color:#e5e5e5;text-align:right;vertical-align:middle;margin-top:18px;">
+                            <a href="@Url.Action("Register", "Home")" style="font-size:9pt">@HttpContext.Current.Session["ssUserName"]</a> |
+                            <a href="@Url.Action("Register", "Home")" style="font-size:9pt">@HttpContext.Current.Session["ssUserRole"]</a> |
+                            <a href="@Url.Action("BackOut", "System")" style="font-size:9pt">[LOG OFF]</a>
+                        </div>
                         }
                         else
                         {
@@ -49,32 +50,41 @@
         </div>
         <div class="row" style="margin-top:0px;background-color:#4CAF50;">
             <div class="dropdown">
-                <button class="dropbtn">
-                    Event
-                </button>
-                <div class="dropdown-content">
-                    <a href="/Event/CreateEvent" style="font-size:9pt">Create</a>
-                    <a href="@Url.Action("ManageEvent", "Event")" style="font-size:9pt">Manage</a>
-                </div>
+                @if (HttpContext.Current.Session["ssUserRole"] != null && HttpContext.Current.Session["ssUserRole"].ToString() == "1")
+                {
+                    <button class="dropbtn">
+                        Event
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="/Event/CreateEvent" style="font-size:9pt">Create</a>
+                        <a href="@Url.Action("ManageEvent", "Event")" style="font-size:9pt">Manage</a>
+                    </div>
+                }
             </div>
             <div class="dropdown">
-                <button class="dropbtn">
-                    Food Truck
-                </button>
-                <div class="dropdown-content">
-                    <a href="@Url.Action("FoodtruckProfile", "Foodtruck")" style="font-size:9pt">Profile</a>
-                    <a href="@Url.Action("EventRegisterView", "Foodtruck")" style="font-size:9pt">Register event</a>
-                </div>
+                @if (HttpContext.Current.Session["ssUserRole"] != null && HttpContext.Current.Session["ssUserRole"].ToString() == "2")
+                {
+                    <button class="dropbtn">
+                        Food Truck
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="@Url.Action("FoodtruckProfile", "Foodtruck")" style="font-size:9pt">Profile</a>
+                        <a href="@Url.Action("EventRegisterView", "Foodtruck")" style="font-size:9pt">Register event</a>
+                    </div>
+                }
             </div>
             <div class="dropdown">
-                <button class="dropbtn">
-                    Menu
-                </button>
-                <div class="dropdown-content">
-                    <a href="@Url.Action("Menu", "Menu")" style="font-size:9pt">Menu</a>
-                    <a href="@Url.Action("MenuStyle", "Menu")" style="font-size:9pt">Menu Style</a>
-                    <a href="@Url.Action("MenuType", "Menu")" style="font-size:9pt">Menu Type</a>
-                </div>
+                @if (HttpContext.Current.Session["ssUserRole"] != null && HttpContext.Current.Session["ssUserRole"].ToString() == "4")
+                {
+                    <button class="dropbtn">
+                        Menu
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="@Url.Action("Menu", "Menu")" style="font-size:9pt">Menu</a>
+                        <a href="@Url.Action("MenuStyle", "Menu")" style="font-size:9pt">Menu Style</a>
+                        <a href="@Url.Action("MenuType", "Menu")" style="font-size:9pt">Menu Type</a>
+                    </div>
+                }
             </div>
         </div>
         <div class="row" ng-app="FoodTruck_Module">

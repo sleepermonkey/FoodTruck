@@ -114,7 +114,12 @@ namespace Jarju.Controllers
                 Session.Add(Cons.SS_USER_ID, user.Replace("cu", ""));
                 Session.Add(Cons.SS_USER_ROLE, '3');
             }
-            
+            else if (user.Contains("ad"))
+            {
+                Session.Add(Cons.SS_USER_ID, user.Replace("cu", ""));
+                Session.Add(Cons.SS_USER_ROLE, '4');
+            }
+
             Session.Add(Cons.SS_USER_NAME, usrname);
             Session.Add(Cons.SS_USER_LAST_NAME, '1');
             Session.Add(Cons.SS_USER_LANG, '1');

@@ -50,8 +50,8 @@ namespace FoodTruck.Controllers
         public JsonResult CheckUser()
         {
             DataTable dt = new DataTable();
-            gSQL = "SELECT * FROM TBL_USER WHERE USERNAME = '{0}'";
-            gSQL = String.Format(gSQL, Request.Form["USERNAME"]);
+            gSQL = "SELECT * FROM TBL_USER WHERE USERNAME = '{0}' AND USER_ID != '{1}'";
+            gSQL = String.Format(gSQL, Request.Form["USERNAME"], Request.Form["USER_ID"]);
             dt = odb.SqlQuery(gSQL, mDBName);
 
             return Json(DTFM.convertToList(dt), JsonRequestBehavior.AllowGet);
@@ -67,14 +67,22 @@ namespace FoodTruck.Controllers
                 gSQL += "SURNAME = '{1}',";
                 gSQL += "CITIZEN_ID = '{2}',";
                 gSQL += "PASSWORD = '{3}',";
-                gSQL += "ROLE_ID = '{4}' ";
-                gSQL += "WHERE USER_ID = '{5}';";
+                gSQL += "COMPANY_NAME = '{4}',";
+                gSQL += "COMPANY_ID = '{5}',";
+                gSQL += "EMAIL = '{6}',";
+                gSQL += "TEL = '{7}',";
+                gSQL += "ADDRESS = '{8}' ";
+                gSQL += "WHERE USER_ID = '{9}';";
                 gSQL = String.Format(gSQL,
                      Request.Form["NAME"],
                      Request.Form["SURNAME"],
                      Request.Form["CITIZEN_ID"],
                      Request.Form["PASSWORD"],
-                     Request.Form["ROLE_ID"],
+                     Request.Form["COMPANY_NAME"],
+                     Request.Form["COMPANY_ID"],
+                     Request.Form["EMAIL"],
+                     Request.Form["TEL"],
+                     Request.Form["ADDRESS"],
                      Session[Cons.SS_USER_ID].ToString());
                 gSQL += "SELECT * FROM TBL_USER WHERE USER_ID = '" + Session[Cons.SS_USER_ID].ToString() + "'";
                 dt = odb.SqlQuery(gSQL, mDBName);
@@ -87,6 +95,11 @@ namespace FoodTruck.Controllers
                 gSQL += "CITIZEN_ID,";
                 gSQL += "USERNAME,";
                 gSQL += "PASSWORD,";
+                gSQL += "COMPANY_NAME,";
+                gSQL += "COMPANY_ID,";
+                gSQL += "EMAIL,";
+                gSQL += "TEL,";
+                gSQL += "ADDRESS,";
                 gSQL += "ROLE_ID) ";
                 gSQL += "VALUES (";
                 gSQL += "'{0}',";
@@ -94,13 +107,23 @@ namespace FoodTruck.Controllers
                 gSQL += "'{2}',";
                 gSQL += "'{3}',";
                 gSQL += "'{4}',";
-                gSQL += "'{5}') ";
+                gSQL += "'{5}',";
+                gSQL += "'{6}',";
+                gSQL += "'{7}',";
+                gSQL += "'{8}',";
+                gSQL += "'{9}',";
+                gSQL += "'{10}') ";
                 gSQL = String.Format(gSQL,
                      Request.Form["NAME"],
                      Request.Form["SURNAME"],
                      Request.Form["CITIZEN_ID"],
                      Request.Form["USERNAME"],
                      Request.Form["PASSWORD"],
+                     Request.Form["COMPANY_NAME"],
+                     Request.Form["COMPANY_ID"],
+                     Request.Form["EMAIL"],
+                     Request.Form["TEL"],
+                     Request.Form["ADDRESS"],
                      Request.Form["ROLE_ID"]);
                 dt = odb.SqlQuery(gSQL, mDBName);
             }

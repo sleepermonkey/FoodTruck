@@ -50,6 +50,22 @@
                 </div>
                 <div class="row custom-row">
                     <div class="col-md-4">
+                        Email:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.User.EMAIL">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Tel:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.User.TEL">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
                         User name:
                     </div>
                     <div class="col-md-8">
@@ -77,7 +93,7 @@
                         Role:
                     </div>
                     <div class="col-md-8">
-                        <select class="form-control" ng-model="formData.User.ROLE_ID" convert-to-number style="width:75%">
+                        <select class="form-control" ng-model="formData.User.ROLE_ID" convert-to-number style="width:75%" ng-disabled="formData.User.USER_ID != 0">
                             <option value="1">
                                 Organizer
                             </option>
@@ -88,6 +104,32 @@
                                 Customer
                             </option>
                         </select>
+                    </div>
+                </div>
+            </div>
+            <div id="CustomerInfo" class="col-sm-5" ng-hide="formData.User.ROLE_ID == 3">
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Company Name:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.User.COMPANY_NAME">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Company ID:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="foodmenuname" ng-model="formData.User.COMPANY_ID">
+                    </div>
+                </div>
+                <div class="row custom-row">
+                    <div class="col-md-4">
+                        Address:
+                    </div>
+                    <div class="col-md-8">
+                        <textarea class="form-control" rows="3" placeholder="Company Address" ng-model="formData.User.ADDRESS"></textarea>
                     </div>
                 </div>
             </div>
